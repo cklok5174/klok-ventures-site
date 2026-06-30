@@ -5,6 +5,7 @@
 <link rel="icon" type="image/png" href="klokventures-favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Start a Project — Klok Ventures</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@300;400;500;700&family=Sora:wght@300;400;500;600;700&display=swap');
 
@@ -190,27 +191,6 @@ select.field-input { cursor: pointer; background-image: url("data:image/svg+xml,
 .success-icon { font-size: 48px; margin-bottom: 20px; }
 .success-title { font-size: 28px; font-weight: 700; color: var(--white); letter-spacing: -0.02em; margin-bottom: 12px; }
 .success-sub { font-size: 14px; font-weight: 300; color: var(--silver); line-height: 1.7; max-width: 480px; margin: 0 auto 32px; }
-.output-box {
-  background: var(--dark); border: 1px solid var(--divider); border-left: 3px solid var(--blue);
-  padding: 20px; text-align: left; margin-bottom: 16px; position: relative;
-}
-.output-box-label { font-family: 'Azeret Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
-.output-text { font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--silver); line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
-.copy-btn {
-  position: absolute; top: 12px; right: 12px;
-  font-family: 'Azeret Mono', monospace; font-size: 9px; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase; background: var(--panel);
-  color: var(--muted); border: 1px solid var(--divider); padding: 5px 10px;
-  cursor: pointer; transition: all 0.15s;
-}
-.copy-btn:hover { border-color: var(--blue); color: var(--blue); }
-.copy-btn.copied { border-color: var(--green); color: #4CAF70; }
-
-/* DETAILS / SUMMARY */
-details summary { list-style: none; }
-details summary::-webkit-details-marker { display: none; }
-details summary::before { content: '▶'; display: inline-block; font-size: 8px; margin-right: 8px; transition: transform 0.15s; }
-details[open] summary::before { transform: rotate(90deg); }
 
 /* HIGHLIGHT */
 .info-box { background: var(--panel); border: 1px solid var(--divider); border-left: 3px solid var(--blue); padding: 14px 16px; margin-bottom: 24px; }
@@ -610,29 +590,10 @@ footer { background: var(--dark); border-top: 1px solid var(--divider); padding:
 
 <!-- SUCCESS -->
 <div class="form-wrap success-panel" id="success-panel">
-  <div class="success-icon">⚡</div>
-  <div class="success-title">Your intake is ready.</div>
-  <div class="success-sub">Click below to open your email with everything filled in — review it, then hit send.</div>
-
-  <a id="send-email-btn" class="btn-primary" href="#" style="display:inline-block;font-size:14px;padding:16px 32px;margin-bottom:32px">Send to Connor →</a>
-
-  <div style="background:var(--panel);border:1px solid var(--divider);padding:16px 20px;text-align:left;margin-bottom:24px">
-    <div style="font-family:'Azeret Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">What happens next</div>
-    <div style="font-size:13px;font-weight:300;color:var(--silver);line-height:1.7">
-      1. Clicking the button above opens your email app with everything pre-filled — just hit send<br>
-      2. Connor reviews it and comes back with real ideas — whether that's a working demo, a sample tool, or a clear plan<br>
-      3. We talk through what fits best, then move forward together
-    </div>
-  </div>
-
-  <details style="text-align:left;margin-top:8px">
-    <summary style="font-family:'Azeret Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;padding:8px 0">Advanced: View full technical summary</summary>
-    <div class="output-box" style="margin-top:12px">
-      <div class="output-box-label">Full Summary — For Reference or Manual Copy</div>
-      <div class="output-text" id="output-text"></div>
-      <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copy</button>
-    </div>
-  </details>
+  <div class="success-icon" id="success-icon">⚡</div>
+  <div class="success-title" id="success-title">Sending your project details…</div>
+  <div class="success-sub" id="success-sub">One moment.</div>
+</div>
 </div>
 
 <footer>
@@ -641,6 +602,11 @@ footer { background: var(--dark); border-top: 1px solid var(--divider); padding:
 </footer>
 
 <script>
+// ── Supabase Client ────────────────────────────────────────────
+const SUPABASE_URL = 'https://dmlfvwvcklovrhpumpnd.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_63p3t0VbEiUsWiP7koWAGA_KGBtdrz3';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
 // ── Clock ──────────────────────────────────────────────────────
 function updateClock() {
   const now = new Date();
@@ -809,7 +775,7 @@ function buildReview() {
 }
 
 // ── Submit → Generate Prompt ───────────────────────────────────
-function submitForm() {
+async function submitForm() {
   const industry = getChips('industry-chips');
   const bizName = val('biz-name');
   const contactName = val('contact-name');
@@ -836,134 +802,52 @@ function submitForm() {
   const integrations = val('integrations');
   const anythingElse = val('anything-else');
 
-  const hasAppDetails = appPurpose !== '—' || features !== '—';
-
-  const prompt = `NEW KLOK VENTURES CLIENT — FIND AND BUILD THE RIGHT SOLUTION
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CLIENT OVERVIEW
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Business: ${bizName}
-Contact: ${contactName} (${contactEmail})
-Industry: ${industry}
-Size: ${bizSize}
-Years in business: ${bizAge}
-
-About the business:
-${bizDesc}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-THE PROBLEM TO SOLVE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Core workflow problem:
-${problem}
-
-Who is affected: ${whoAffected}
-Currently using: ${currentTools}
-
-Cost / impact of the problem:
-${costProblem}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-IF A CUSTOM TOOL MAKES SENSE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Tool name: ${demoName}
-Who would use it: ${appUsers}
-Approx users: ${userCount}
-
-What it might need to do:
-${appPurpose}
-
-Capabilities that might matter: ${features}
-
-Integrations to consider: ${integrations}
-
-Visual style direction: ${style}
-Primary brand color: ${brandColor}
-Design notes: ${styleNotes}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PROJECT CONTEXT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Urgency: ${urgency}
-Budget range: ${budget}
-Retainer interest: ${retainer}
-Additional notes: ${anythingElse}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-INSTRUCTIONS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-First, analyze the problem above and recommend the right type of solution before building anything — a custom app, a spreadsheet/automation tool, a process change, or some combination. Briefly explain why.
-
-If a custom app or interactive tool is the right fit (or the client indicated interest in one above), build a single-file offline-capable HTML PWA demo that:
-
-1. Uses a visual design that fits the "${style}" style with "${brandColor}" as the primary accent color
-2. Shows the name "${demoName}" in the header
-3. Solves the specific problem described above — the tabs and features should reflect the actual workflow, not a generic template
-4. Includes realistic dummy data that mirrors this client's actual industry and business (use "${bizName}" context throughout)
-5. Features the relevant capabilities: ${features}
-6. Includes a "★ Why This Helps" tab that addresses the specific pain points described above and includes a CTA to contact cklok5174@gmail.com
-7. Adds a subtle "Demo · klok-ventures.com" watermark in the bottom-right corner
-8. Is fully functional with interactive elements — tappable, offline-capable, mobile-first
-9. Is delivered as a single self-contained HTML file
-
-If a spreadsheet, automation, or process fix is the better answer, describe that solution clearly instead — what it would look like, how it would work, and what it would take to build or implement it. Don't force an app where one isn't the right tool.`;
-
-  document.getElementById('output-text').textContent = prompt;
-
-  // Build a shorter, email-friendly summary for the mailto link
-  const emailSummary = `Hi Connor,
-
-I filled out the project intake form. Here's a summary:
-
-BUSINESS
-${bizName} — ${industry}
-Contact: ${contactName} (${contactEmail}${contactPhone !== '—' ? ', ' + contactPhone : ''})
-Size: ${bizSize} | Years in business: ${bizAge}
-
-About: ${bizDesc}
-
-THE PROBLEM
-${problem}
-
-Who's affected: ${whoAffected}
-Currently using: ${currentTools}
-Cost of the problem: ${costProblem}
-
-POSSIBLE TOOL DETAILS
-${appPurpose !== '—' ? 'What it might need to do: ' + appPurpose : 'No specific tool in mind yet — open to your recommendation.'}
-${features !== '—' ? 'Capabilities that might matter: ' + features : ''}
-${style !== '—' ? 'Style direction: ' + style : ''}
-${brandColor !== '—' ? 'Brand color: ' + brandColor : ''}
-
-LOGISTICS
-Urgency: ${urgency}
-Budget range: ${budget}
-Retainer interest: ${retainer}
-Integrations: ${integrations}
-${anythingElse !== '—' ? 'Other notes: ' + anythingElse : ''}
-
-Looking forward to hearing your thoughts.`;
-
-  // Build the mailto link
-  const subject = encodeURIComponent('Project Inquiry — ' + bizName);
-  const body = encodeURIComponent(emailSummary);
-  const mailtoLink = `mailto:cklok5174@gmail.com?subject=${subject}&body=${body}`;
-  document.getElementById('send-email-btn').href = mailtoLink;
+  // Insert directly into Supabase — silent, no user-facing copy/paste/email step
+  const { data, error } = await supabaseClient
+    .from('intake_submissions')
+    .insert([{
+      business_name: bizName,
+      contact_name: contactName,
+      contact_email: contactEmail,
+      contact_phone: contactPhone,
+      industry: industry,
+      business_description: bizDesc,
+      business_size: bizSize,
+      business_age: bizAge,
+      main_problem: problem,
+      who_affected: whoAffected,
+      current_tools: currentTools,
+      cost_of_problem: costProblem,
+      app_users: appUsers,
+      user_count: userCount,
+      app_purpose: appPurpose,
+      features: features,
+      style: style,
+      brand_color: brandColor,
+      demo_name: demoName,
+      style_notes: styleNotes,
+      urgency: urgency,
+      budget: budget,
+      retainer: retainer,
+      integrations: integrations,
+      referral: val('referral'),
+      anything_else: anythingElse
+    }]);
 
   document.getElementById('panel-5').classList.remove('active');
   document.getElementById('success-panel').classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
-}
 
-function copyPrompt() {
-  const text = document.getElementById('output-text').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById('copy-btn');
-    btn.textContent = 'Copied ✓';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
-  });
+  if (error) {
+    console.error('Submission error:', error);
+    document.getElementById('success-icon').textContent = '⚠️';
+    document.getElementById('success-title').textContent = "Something went wrong.";
+    document.getElementById('success-sub').textContent = 'Please email cklok5174@gmail.com directly so nothing gets lost — sorry about that.';
+  } else {
+    document.getElementById('success-icon').textContent = '✓';
+    document.getElementById('success-title').textContent = "You're all set.";
+    document.getElementById('success-sub').textContent = "Connor has your project details and will follow up soon.";
+  }
 }
 </script>
 </body>
