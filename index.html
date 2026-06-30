@@ -56,7 +56,7 @@ nav {
 .hero {
   min-height: 100vh; display: flex; flex-direction: column;
   justify-content: flex-end; padding: 56px 24px 48px;
-  position: relative; overflow: hidden;
+  position: relative; overflow: hidden; text-align: center;
 }
 .hero-grid {
   position: absolute; inset: 0; pointer-events: none;
@@ -79,9 +79,9 @@ nav {
 .hero-headline em { font-style: normal; color: var(--blue); }
 .hero-sub {
   font-size: 16px; font-weight: 300; color: var(--silver); max-width: 520px;
-  line-height: 1.7; margin-bottom: 36px;
+  line-height: 1.7; margin: 0 auto 36px;
 }
-.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: center; }
 .btn-primary {
   font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 700;
   letter-spacing: 0.1em; text-transform: uppercase; background: var(--blue);
@@ -98,7 +98,7 @@ nav {
 .btn-ghost:hover { border-color: var(--silver); color: var(--white); }
 .hero-stat-row {
   display: flex; gap: 32px; margin-top: 56px; padding-top: 32px;
-  border-top: 1px solid var(--divider); flex-wrap: wrap;
+  border-top: 1px solid var(--divider); flex-wrap: wrap; justify-content: center;
 }
 .hero-stat-num {
   font-family: 'Azeret Mono', monospace; font-size: 28px; font-weight: 700;
@@ -110,8 +110,8 @@ nav {
 }
 
 /* ── SECTIONS ── */
-section { padding: 80px 24px; max-width: 1000px; margin: 0 auto; }
-.section-full { padding: 80px 24px; background: var(--dark); }
+section { padding: 80px 24px; max-width: 1000px; margin: 0 auto; text-align: center; }
+.section-full { padding: 80px 24px; background: var(--dark); text-align: center; }
 .section-full-inner { max-width: 1000px; margin: 0 auto; }
 
 .sec-eyebrow {
@@ -125,7 +125,7 @@ section { padding: 80px 24px; max-width: 1000px; margin: 0 auto; }
 }
 .sec-sub {
   font-size: 15px; font-weight: 300; color: var(--silver); max-width: 540px;
-  line-height: 1.7; margin-bottom: 40px;
+  line-height: 1.7; margin: 0 auto 40px;
 }
 
 /* ── HOW IT WORKS ── */
@@ -499,7 +499,12 @@ footer {
       <br>
       <p>If you have a workflow that's running on paper, group texts, or a spreadsheet someone built in 2018 — I can probably fix it fast.</p>
       <br>
-      <p style="font-size:13px;color:var(--muted)">Connor Klok · Portage, MI · <a href="https://www.linkedin.com/in/connor-klok" target="_blank" style="color:var(--blue);text-decoration:none">LinkedIn</a></p>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+        <a href="https://www.linkedin.com/in/connor-klok" target="_blank" style="flex-shrink:0">
+          <img src="connor-klok-headshot.jpg" alt="Connor Klok" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid var(--divider);display:block">
+        </a>
+        <p style="font-size:13px;color:var(--muted);margin:0">Connor Klok · Portage, MI · <a href="https://www.linkedin.com/in/connor-klok" target="_blank" style="color:var(--blue);text-decoration:none">LinkedIn</a></p>
+      </div>
     </div>
   </div>
 </section>
