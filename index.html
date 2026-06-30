@@ -35,8 +35,10 @@ nav {
 }
 .nav-logo {
   font-family: 'Azeret Mono', monospace; font-size: 16px; font-weight: 700;
-  color: var(--white); letter-spacing: 0.04em;
+  color: var(--white); letter-spacing: 0.04em; text-decoration: none;
+  display: flex; align-items: center; gap: 9px;
 }
+.nav-logo img { height: 22px; width: 22px; object-fit: contain; flex-shrink: 0; }
 .nav-logo span { color: var(--blue); }
 .nav-clock {
   font-family: 'Azeret Mono', monospace; font-size: 13px; color: var(--muted);
@@ -242,9 +244,9 @@ footer {
 <body>
 
 <nav>
-  <div class="nav-logo"><img src="klokventures-logo.png" alt="Klok Ventures" style="height:32px;width:32px;object-fit:contain;flex-shrink:0"> Klok<span>Ventures</span></div>
+  <a class="nav-logo" href="index.html"><img src="klokventures-logo.png" alt="Klok Ventures">Klok&nbsp;<span>Ventures</span></a>
   <div class="nav-clock" id="nav-clock">00:00:00</div>
-  <a class="nav-cta" href="mailto:cklok5174@gmail.com">Get in Touch</a>
+  <a class="nav-cta" href="klokventures-intake.html">Get in Touch</a>
 </nav>
 
 <!-- HERO -->
@@ -493,11 +495,11 @@ footer {
       <br>
       <p>I work with owners and operators directly — no account managers, no handoff to a junior developer, no six-week waiting period. <strong>You talk to me, I build it, you own it.</strong></p>
       <br>
-      <p>I specialize in Progressive Web Apps because they hit a sweet spot that nothing else does: native-quality experience, web-speed delivery, and a cost structure that actually works for businesses that aren't Fortune 500 companies. For lighter operational fixes — scheduling, payroll, dispatch — I also offer <a href="klokventures-automation.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">process & automation consulting</a>.</p>
+      <p>I specialize in Progressive Web Apps because they hit a sweet spot that nothing else does: native-quality experience, web-speed delivery, and a cost structure that actually works for businesses that aren't Fortune 500 companies. For lighter operational fixes — scheduling, payroll, dispatch — the same thinking applies.</p>
       <br>
       <p>If you have a workflow that's running on paper, group texts, or a spreadsheet someone built in 2018 — I can probably fix it fast.</p>
       <br>
-      <p style="font-size:13px;color:var(--muted)">Connor Klok · Portage, MI · <a href="mailto:cklok5174@gmail.com" style="color:var(--blue);text-decoration:none">cklok5174@gmail.com</a> · <a href="https://www.linkedin.com/in/connor-klok" target="_blank" style="color:var(--blue);text-decoration:none">LinkedIn</a></p>
+      <p style="font-size:13px;color:var(--muted)">Connor Klok · Portage, MI · <a href="https://www.linkedin.com/in/connor-klok" target="_blank" style="color:var(--blue);text-decoration:none">LinkedIn</a></p>
     </div>
   </div>
 </section>
@@ -547,30 +549,15 @@ footer {
 <div class="section-full">
   <div class="section-full-inner">
     <div class="sec-eyebrow">Pricing</div>
-    <h2 class="sec-headline">Every project is quoted.<br>Here's what to expect.</h2>
-    <p class="sec-sub" style="margin-bottom:40px">No fixed packages. Every solution is scoped to what your business actually needs — nothing more, nothing less. We figure out the right fix before talking price.</p>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--divider);border:1px solid var(--divider);margin-bottom:32px">
-      <div style="background:var(--dark);padding:32px 28px">
-        <div style="font-family:'Azeret Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--blue);margin-bottom:12px">One-Time Project</div>
-        <div style="font-family:'Azeret Mono',monospace;font-size:13px;color:var(--muted);margin-bottom:6px">Starting at</div>
-        <div style="font-size:42px;font-weight:700;color:var(--white);line-height:1;letter-spacing:-0.02em;margin-bottom:16px">$1,500</div>
-        <div style="font-size:13px;font-weight:300;color:var(--silver);line-height:1.7">A scoped, fixed-price build based on your specific requirements. You get a working demo first — if it's not right, you don't pay.</div>
-      </div>
-      <div style="background:var(--dark);padding:32px 28px">
-        <div style="font-family:'Azeret Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--blue);margin-bottom:12px">Ongoing Retainer</div>
-        <div style="font-family:'Azeret Mono',monospace;font-size:13px;color:var(--muted);margin-bottom:6px">Starting at</div>
-        <div style="font-size:42px;font-weight:700;color:var(--white);line-height:1;letter-spacing:-0.02em;margin-bottom:16px">$800<span style="font-size:18px;font-weight:400;color:var(--muted)">/mo</span></div>
-        <div style="font-size:13px;font-weight:300;color:var(--silver);line-height:1.7">For businesses that want ongoing updates, new features, and a developer on call. Scope and cadence agreed upfront — no surprises on the invoice.</div>
-      </div>
-    </div>
+    <h2 class="sec-headline">There's no price list — because there's no fixed product.</h2>
+    <p class="sec-sub" style="margin-bottom:40px">A custom app, a process fix, and an automation tool all cost different things, take different amounts of time, and solve different problems. I figure out what you actually need first, then give you a real number — not a number pulled from a generic package.</p>
 
     <div style="background:var(--panel);border:1px solid var(--divider);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
       <div>
-        <div style="font-size:15px;font-weight:600;color:var(--white);margin-bottom:4px">Not sure what your project costs?</div>
-        <div style="font-size:13px;font-weight:300;color:var(--silver)">Tell me what you're trying to build. I'll send you a quote — and a working demo — quickly.</div>
+        <div style="font-size:15px;font-weight:600;color:var(--white);margin-bottom:4px">Curious what your project would cost?</div>
+        <div style="font-size:13px;font-weight:300;color:var(--silver)">Tell me what you're trying to build or fix. I'll come back with a real quote — and a clear sense of what it would take.</div>
       </div>
-      <a class="btn-primary" href="mailto:cklok5174@gmail.com?subject=Quote Request&body=Here's what I'm trying to build:" style="white-space:nowrap;flex-shrink:0">Request a Quote</a>
+      <a class="btn-primary" href="klokventures-intake.html" style="white-space:nowrap;flex-shrink:0">Request a Quote</a>
     </div>
   </div>
 </div>
@@ -580,7 +567,6 @@ footer {
   <h2 class="cta-headline">Ready to find out what's actually slowing you down?</h2>
   <p class="cta-sub">Send me a two-sentence description of your business and what's bugging you — I'll come back with real ideas, not a sales pitch.</p>
   <a class="btn-primary" href="klokventures-intake.html">Send Me a Demo Request</a>
-  <p style="margin-top:20px;font-size:13px;color:var(--muted)">Or email directly: <a class="cta-email" href="mailto:cklok5174@gmail.com">cklok5174@gmail.com</a></p>
 </div>
 
 <footer>
