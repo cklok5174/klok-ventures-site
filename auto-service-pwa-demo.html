@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoTrack — Service Portal</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --graphite: #0D0D0F;
+  --dark: #1A1A1E;
+  --panel: #22222A;
+  --orange: #E8601C;
+  --orange-dim: #A84410;
+  --silver: #B0B8C4;
+  --mist: #E8ECF0;
+  --white: #F5F5F5;
+  --green: #2E8B4A;
+  --yellow: #D4A017;
+  --red: #C0332A;
+  --divider: rgba(255,255,255,0.07);
+}
+
+body { font-family: 'Space Grotesk', sans-serif; background: var(--graphite); color: var(--white); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* HEADER */
+.at-header {
+  background: var(--dark); border-bottom: 2px solid var(--orange);
+  padding: 0 16px; height: 56px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.at-logo { font-size: 18px; font-weight: 700; letter-spacing: 0.06em; color: var(--white); }
+.at-logo span { color: var(--orange); }
+.at-ro {
+  font-family: 'Space Mono', monospace; font-size: 11px; color: var(--silver);
+  background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 3px;
+}
+
+/* VEHICLE BANNER */
+.vehicle-banner {
+  background: var(--dark); padding: 16px;
+  border-bottom: 1px solid var(--divider);
+}
+.vb-row { display: flex; align-items: flex-start; gap: 14px; }
+.vb-icon {
+  width: 52px; height: 52px; background: var(--panel); border-radius: 6px;
+  display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0;
+}
+.vb-year { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--silver); letter-spacing: 0.08em; }
+.vb-model { font-size: 20px; font-weight: 700; color: var(--white); line-height: 1.1; margin-bottom: 4px; }
+.vb-vin { font-family: 'Space Mono', monospace; font-size: 9px; color: rgba(176,184,196,0.5); letter-spacing: 0.06em; }
+.vb-status-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.status-pill {
+  font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+  padding: 4px 10px; border-radius: 3px; font-weight: 700;
+}
+.status-pill.in-progress { background: rgba(232,96,28,0.2); color: var(--orange); }
+.status-pill.waiting { background: rgba(212,160,23,0.2); color: var(--yellow); }
+.status-pill.ready { background: rgba(46,139,74,0.2); color: #4CAF70; }
+.status-pill.mileage { background: rgba(255,255,255,0.06); color: var(--silver); }
+
+/* PIPELINE */
+.pipeline {
+  display: flex; background: var(--panel); border-bottom: 1px solid var(--divider);
+  overflow-x: auto; padding: 12px 16px; gap: 0;
+}
+.pipe-step {
+  display: flex; align-items: center; gap: 0; flex-shrink: 0;
+}
+.pipe-node {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 64px;
+}
+.pipe-dot {
+  width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 11px; font-weight: 700;
+}
+.pipe-dot.done { background: var(--orange); color: white; }
+.pipe-dot.active { background: var(--orange); color: white; box-shadow: 0 0 0 3px rgba(232,96,28,0.3); }
+.pipe-dot.todo { background: rgba(255,255,255,0.08); color: var(--silver); }
+.pipe-label { font-size: 8px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--silver); text-align: center; white-space: nowrap; }
+.pipe-connector { width: 24px; height: 2px; background: rgba(255,255,255,0.1); flex-shrink: 0; margin-top: -18px; }
+.pipe-connector.done { background: var(--orange); }
+
+/* TABS */
+.at-tabs {
+  background: var(--dark); display: flex; border-bottom: 1px solid var(--divider);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.at-tab {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--silver); padding: 12px 18px; cursor: pointer;
+  border-bottom: 2px solid transparent; white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s; user-select: none;
+}
+.at-tab.active { color: var(--white); border-bottom-color: var(--orange); }
+
+/* PANELS */
+.at-content { flex: 1; }
+.panel { display: none; padding: 16px; }
+.panel.active { display: block; }
+.panel.no-pad { padding: 0; }
+
+/* SHARED */
+.sec-label {
+  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--silver); margin-bottom: 10px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--divider);
+}
+
+/* SERVICE TICKET */
+.ticket-item {
+  background: var(--panel); border-radius: 4px; padding: 14px; margin-bottom: 8px;
+  border-left: 3px solid var(--divider);
+}
+.ticket-item.approved { border-left-color: var(--orange); }
+.ticket-item.declined { border-left-color: var(--red); opacity: 0.6; }
+.ticket-item.complete { border-left-color: var(--green); }
+.ticket-item.recommend { border-left-color: var(--yellow); }
+
+.ti-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+.ti-name { font-size: 14px; font-weight: 600; color: var(--white); line-height: 1.3; }
+.ti-price { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--orange); font-weight: 700; }
+.ti-desc { font-size: 11px; color: var(--silver); line-height: 1.5; margin-bottom: 8px; }
+.ti-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.ti-badge {
+  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.08em;
+  padding: 2px 7px; border-radius: 2px;
+}
+.ti-badge.approved { background: rgba(232,96,28,0.15); color: var(--orange); }
+.ti-badge.complete { background: rgba(46,139,74,0.15); color: #4CAF70; }
+.ti-badge.declined { background: rgba(192,51,42,0.15); color: #E06060; }
+.ti-badge.recommend { background: rgba(212,160,23,0.15); color: var(--yellow); }
+
+.approve-row { display: flex; gap: 8px; margin-top: 10px; }
+.approve-btn {
+  flex: 1; padding: 8px; border: none; border-radius: 3px; font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+}
+.approve-btn.yes { background: var(--orange); color: white; }
+.approve-btn.yes:hover { background: #D04E10; }
+.approve-btn.no { background: rgba(255,255,255,0.07); color: var(--silver); }
+
+/* COST SUMMARY */
+.cost-summary { background: var(--panel); border-radius: 4px; padding: 14px; margin-top: 16px; }
+.cost-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 12px; color: var(--silver); border-bottom: 1px solid var(--divider); }
+.cost-row:last-child { border-bottom: none; }
+.cost-row.total { font-size: 15px; font-weight: 700; color: var(--white); border-top: 1px solid rgba(255,255,255,0.15); margin-top: 4px; padding-top: 10px; }
+.cost-row.total .cost-val { color: var(--orange); font-family: 'Space Mono', monospace; }
+
+/* HISTORY */
+.history-card {
+  background: var(--panel); border-radius: 4px; padding: 14px; margin-bottom: 8px;
+}
+.hc-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.hc-date { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--orange); }
+.hc-miles { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--silver); }
+.hc-services { font-size: 13px; font-weight: 500; color: var(--white); margin-bottom: 4px; line-height: 1.4; }
+.hc-total { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--silver); }
+
+/* MESSAGES */
+.msg-bubble {
+  max-width: 85%; margin-bottom: 12px; padding: 10px 14px; border-radius: 6px;
+  font-size: 13px; line-height: 1.5;
+}
+.msg-bubble.advisor { background: var(--panel); color: var(--white); border-bottom-left-radius: 2px; }
+.msg-bubble.client { background: var(--orange); color: white; align-self: flex-end; border-bottom-right-radius: 2px; margin-left: auto; }
+.msg-time { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--silver); margin-bottom: 4px; }
+.msg-time.right { text-align: right; }
+.messages-wrap { display: flex; flex-direction: column; margin-bottom: 12px; }
+.msg-input-row { display: flex; gap: 8px; }
+.msg-input {
+  flex: 1; background: var(--panel); border: 1px solid var(--divider); border-radius: 4px;
+  color: var(--white); font-family: 'Space Grotesk', sans-serif; font-size: 13px;
+  padding: 10px 12px; outline: none;
+}
+.msg-input:focus { border-color: var(--orange); }
+.msg-send {
+  background: var(--orange); border: none; color: white; font-size: 16px;
+  width: 42px; height: 42px; border-radius: 4px; cursor: pointer;
+}
+
+/* VALUE */
+.at-value { padding: 16px 16px 40px; }
+.atv-hero { background: var(--dark); border-radius: 4px; padding: 18px; margin-bottom: 16px; border-left: 3px solid var(--orange); }
+.atv-eyebrow { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange); margin-bottom: 8px; }
+.atv-headline { font-size: 20px; font-weight: 700; color: var(--white); line-height: 1.25; margin-bottom: 8px; }
+.atv-sub { font-size: 12px; color: var(--silver); line-height: 1.65; }
+.atv-sec { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--silver); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--divider); }
+.atv-pain { background: var(--panel); border-radius: 4px; padding: 14px; margin-bottom: 8px; display: flex; gap: 12px; }
+.atv-pain-icon { font-size: 20px; flex-shrink: 0; }
+.atv-pain-title { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+.atv-pain-desc { font-size: 11px; color: var(--silver); line-height: 1.55; }
+.atv-roi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.atv-roi-cell { background: var(--panel); border-radius: 4px; padding: 14px; text-align: center; }
+.atv-roi-num { font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 700; color: var(--orange); line-height: 1; }
+.atv-roi-label { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--silver); margin-top: 5px; line-height: 1.4; }
+.atv-feature-row { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--divider); font-size: 12px; color: var(--silver); align-items: flex-start; }
+.atv-feature-row:last-child { border-bottom: none; }
+.atv-check { color: var(--orange); flex-shrink: 0; font-weight: 700; }
+.atv-cta { background: var(--orange); border-radius: 4px; padding: 20px; margin-top: 16px; text-align: center; }
+.atv-cta-headline { font-size: 18px; font-weight: 700; color: white; margin-bottom: 6px; }
+.atv-cta-sub { font-size: 11px; color: rgba(255,255,255,0.75); margin-bottom: 14px; line-height: 1.5; }
+.atv-cta-btn { display: inline-block; background: var(--graphite); color: var(--white); font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; padding: 11px 22px; border-radius: 3px; text-decoration: none; border: none; cursor: pointer; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--orange); color: white; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; padding: 10px 20px;
+  border-radius: 3px; z-index: 999; transition: transform 0.25s; white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header class="at-header">
+  <div class="at-logo">Auto<span>Track</span></div>
+  <div class="at-ro">RO #48291</div>
+</header>
+
+<div class="vehicle-banner">
+  <div class="vb-row">
+    <div class="vb-icon">🚙</div>
+    <div>
+      <div class="vb-year">2021 · YOUR VEHICLE</div>
+      <div class="vb-model">Toyota 4Runner SR5</div>
+      <div class="vb-vin">VIN: JTEBU5JR8M5·····847</div>
+    </div>
+  </div>
+  <div class="vb-status-row">
+    <span class="status-pill in-progress">● In Service</span>
+    <span class="status-pill mileage">62,441 mi</span>
+    <span class="status-pill waiting">Est. Ready: 4:30 PM</span>
+  </div>
+</div>
+
+<div class="pipeline">
+  <div class="pipe-step">
+    <div class="pipe-node">
+      <div class="pipe-dot done">✓</div>
+      <div class="pipe-label">Check-In</div>
+    </div>
+    <div class="pipe-connector done"></div>
+  </div>
+  <div class="pipe-step">
+    <div class="pipe-node">
+      <div class="pipe-dot done">✓</div>
+      <div class="pipe-label">Inspection</div>
+    </div>
+    <div class="pipe-connector done"></div>
+  </div>
+  <div class="pipe-step">
+    <div class="pipe-node">
+      <div class="pipe-dot active">⚙</div>
+      <div class="pipe-label">In Service</div>
+    </div>
+    <div class="pipe-connector"></div>
+  </div>
+  <div class="pipe-step">
+    <div class="pipe-node">
+      <div class="pipe-dot todo">4</div>
+      <div class="pipe-label">QC Check</div>
+    </div>
+    <div class="pipe-connector"></div>
+  </div>
+  <div class="pipe-step">
+    <div class="pipe-node">
+      <div class="pipe-dot todo">5</div>
+      <div class="pipe-label">Ready</div>
+    </div>
+  </div>
+</div>
+
+<nav class="at-tabs">
+  <div class="at-tab active" data-tab="ticket">Service Ticket</div>
+  <div class="at-tab" data-tab="history">History</div>
+  <div class="at-tab" data-tab="messages">Messages</div>
+  <div class="at-tab" data-tab="value" style="color:var(--orange)">★ Why This App</div>
+</nav>
+
+<div class="at-content">
+
+  <!-- SERVICE TICKET -->
+  <div class="panel active" id="panel-ticket">
+    <div class="sec-label">Approved Work</div>
+
+    <div class="ticket-item complete">
+      <div class="ti-header">
+        <div class="ti-name">Oil & Filter Change (Full Synthetic)</div>
+        <div class="ti-price">$89</div>
+      </div>
+      <div class="ti-desc">5W-30 full synthetic, OEM filter. Includes multi-point inspection. ✓ Complete</div>
+      <div class="ti-badges"><span class="ti-badge complete">Complete</span></div>
+    </div>
+
+    <div class="ticket-item approved">
+      <div class="ti-header">
+        <div class="ti-name">Front Brake Pads + Rotor Resurface</div>
+        <div class="ti-price">$312</div>
+      </div>
+      <div class="ti-desc">Front pads at 2mm — below safe threshold. Rotors within spec for resurface. Tech in progress now.</div>
+      <div class="ti-badges"><span class="ti-badge approved">In Progress</span></div>
+    </div>
+
+    <div class="sec-label" style="margin-top:16px">Recommended — Awaiting Approval</div>
+
+    <div class="ticket-item recommend" id="item-cabin">
+      <div class="ti-header">
+        <div class="ti-name">Cabin Air Filter Replacement</div>
+        <div class="ti-price">$54</div>
+      </div>
+      <div class="ti-desc">Filter is clogged — affects A/C efficiency and air quality. Last replaced at 38k mi. Photo attached by tech.</div>
+      <div class="ti-badges"><span class="ti-badge recommend">Recommended</span></div>
+      <div class="approve-row">
+        <button class="approve-btn yes" onclick="approveItem('item-cabin', 'Cabin Filter', 54)">Approve $54</button>
+        <button class="approve-btn no" onclick="declineItem('item-cabin')">Decline</button>
+      </div>
+    </div>
+
+    <div class="ticket-item recommend" id="item-fuel">
+      <div class="ti-header">
+        <div class="ti-name">Fuel System Cleaning</div>
+        <div class="ti-price">$129</div>
+      </div>
+      <div class="ti-desc">Carbon buildup noted on injectors. Cleaning improves fuel economy and rough idle. Advisor recommendation based on mileage and fuel type.</div>
+      <div class="ti-badges"><span class="ti-badge recommend">Recommended</span></div>
+      <div class="approve-row">
+        <button class="approve-btn yes" onclick="approveItem('item-fuel', 'Fuel System Cleaning', 129)">Approve $129</button>
+        <button class="approve-btn no" onclick="declineItem('item-fuel')">Decline</button>
+      </div>
+    </div>
+
+    <div class="ticket-item declined">
+      <div class="ti-header">
+        <div class="ti-name">Rear Differential Service</div>
+        <div class="ti-price">$210</div>
+      </div>
+      <div class="ti-desc">Declined by customer — will revisit at next service. Due at 65k mi per Toyota schedule.</div>
+      <div class="ti-badges"><span class="ti-badge declined">Declined — Flag at 65k</span></div>
+    </div>
+
+    <div class="cost-summary" id="cost-summary">
+      <div class="cost-row"><span>Oil & Filter Change</span><span>$89</span></div>
+      <div class="cost-row"><span>Front Brakes + Rotors</span><span>$312</span></div>
+      <div class="cost-row" id="extra-lines"></div>
+      <div class="cost-row"><span>Labor subtotal</span><span id="labor-sub">$401</span></div>
+      <div class="cost-row"><span>Tax (8.25%)</span><span id="tax-line">$33.08</span></div>
+      <div class="cost-row total"><span>Estimated Total</span><span class="cost-val" id="grand-total">$434.08</span></div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="panel" id="panel-history">
+    <div class="sec-label">Service History — Last 4 Visits</div>
+
+    <div class="history-card">
+      <div class="hc-header">
+        <div class="hc-date">Today · Jun 24, 2026</div>
+        <div class="hc-miles">62,441 mi</div>
+      </div>
+      <div class="hc-services">Oil Change · Front Brakes · (In Progress)</div>
+      <div class="hc-total">Pending</div>
+    </div>
+
+    <div class="history-card">
+      <div class="hc-header">
+        <div class="hc-date">Jan 8, 2026</div>
+        <div class="hc-miles">58,104 mi</div>
+      </div>
+      <div class="hc-services">Oil Change (full synthetic) · Tire Rotation · Multi-Point Inspection · Wiper Blade Set</div>
+      <div class="hc-total">Total: $147.22</div>
+    </div>
+
+    <div class="history-card">
+      <div class="hc-header">
+        <div class="hc-date">Aug 2, 2025</div>
+        <div class="hc-miles">52,880 mi</div>
+      </div>
+      <div class="hc-services">30k Service Package · Spark Plugs · Air Filter · Cabin Filter · Throttle Body Clean · Tire Rotation</div>
+      <div class="hc-total">Total: $682.40</div>
+    </div>
+
+    <div class="history-card">
+      <div class="hc-header">
+        <div class="hc-date">Feb 14, 2025</div>
+        <div class="hc-miles">47,211 mi</div>
+      </div>
+      <div class="hc-services">Oil Change · Rear Brake Pads (replaced) · Alignment Check</div>
+      <div class="hc-total">Total: $388.75</div>
+    </div>
+
+    <div style="background:var(--panel);border-radius:4px;padding:14px;margin-top:4px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--silver);margin-bottom:6px">Next Due</div>
+      <div style="font-size:13px;color:var(--white);margin-bottom:4px">Oil Change — due at 65,000 mi or Dec 2026</div>
+      <div style="font-size:13px;color:var(--yellow)">Rear Differential — declined today, due at 65,000 mi</div>
+    </div>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="panel" id="panel-messages">
+    <div class="sec-label">Advisor: Marcus Webb · Service Bay 4</div>
+
+    <div class="messages-wrap" id="msg-list">
+      <div>
+        <div class="msg-time">9:04 AM</div>
+        <div class="msg-bubble advisor">Good morning! Your 4Runner is checked in and our tech Derek has started the multi-point. We'll have recommendations to you within the hour.</div>
+      </div>
+      <div>
+        <div class="msg-time">10:22 AM</div>
+        <div class="msg-bubble advisor">Inspection is done. Front brakes are at 2mm — we recommend doing those today. I've added everything to your ticket. You can approve or decline right in the app.</div>
+      </div>
+      <div>
+        <div class="msg-time right">10:35 AM</div>
+        <div class="msg-bubble client">Go ahead on the brakes. Holding off on the differential for now — I'll do it next visit.</div>
+      </div>
+      <div>
+        <div class="msg-time">10:37 AM</div>
+        <div class="msg-bubble advisor">Got it — approved brakes, declined differential (flagged for 65k). Derek is pulling your car into the bay now. Est. ready by 4:30 PM.</div>
+      </div>
+    </div>
+
+    <div class="msg-input-row">
+      <input class="msg-input" id="msg-text" type="text" placeholder="Message your advisor…">
+      <button class="msg-send" onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+
+  <!-- VALUE -->
+  <div class="panel no-pad" id="panel-value">
+    <div class="at-value">
+      <div class="atv-hero">
+        <div class="atv-eyebrow">Built for Auto Dealerships & Service Centers</div>
+        <div class="atv-headline">Stop calling customers with updates. Let them watch their vehicle move through the shop in real time.</div>
+        <div class="atv-sub">AutoTrack gives service customers a live view of their vehicle's status, a digital approve/decline ticket, full service history, and direct messaging with their advisor — all from a link sent at check-in. No app download. No hold music.</div>
+      </div>
+
+      <div class="atv-sec">Pain Points This Eliminates</div>
+
+      <div class="atv-pain">
+        <div class="atv-pain-icon">📞</div>
+        <div>
+          <div class="atv-pain-title">Advisors spending 40% of their day on status calls</div>
+          <div class="atv-pain-desc">Every "is my car ready?" call takes 3–5 minutes and pulls advisors off the write-up desk. The live pipeline view — check-in → inspection → in service → QC → ready — answers that question before the customer even picks up the phone. Dealerships using digital status boards report 60%+ fewer inbound status calls per RO.</div>
+        </div>
+      </div>
+      <div class="atv-pain">
+        <div class="atv-pain-icon">🖊️</div>
+        <div>
+          <div class="atv-pain-title">Customers declining work because they can't see what's recommended or why</div>
+          <div class="atv-pain-desc">A verbal "your cabin filter is dirty, want to do it for $54?" at the service counter feels like a pressure tactic. The same recommendation shown in the app — with a description, photo, and a clear approve/decline button — converts at a significantly higher rate because the customer is in control and not on the spot.</div>
+        </div>
+      </div>
+      <div class="atv-pain">
+        <div class="atv-pain-icon">🧾</div>
+        <div>
+          <div class="atv-pain-title">Paper ROs that customers lose — and argue about later</div>
+          <div class="atv-pain-desc">When a customer says "I didn't approve that," the dispute starts because they have no record. Every approval and decline in this app is timestamped and linked to the RO. The paper trail lives on the customer's phone, not in a glove box. No disputes, no chargebacks, no he-said-she-said.</div>
+        </div>
+      </div>
+      <div class="atv-pain">
+        <div class="atv-pain-icon">📅</div>
+        <div>
+          <div class="atv-pain-title">No visibility into service history at the counter</div>
+          <div class="atv-pain-desc">When a customer comes in and the advisor has to hunt through the DMS to find what was done 14 months ago, it wastes time and erodes confidence. Every past visit, mileage, and service performed is visible here — to both the customer and the advisor — before the RO is even opened.</div>
+        </div>
+      </div>
+      <div class="atv-pain">
+        <div class="atv-pain-icon">🔁</div>
+        <div>
+          <div class="atv-pain-title">No mechanism to bring customers back for declined work</div>
+          <div class="atv-pain-desc">When work is declined today, it disappears. AutoTrack flags it in the history with the mileage trigger — so when the customer opens the app before their next visit, they see "Rear Differential — due at 65k" staring them in the face. That's revenue that would otherwise walk out the door.</div>
+        </div>
+      </div>
+      <div class="atv-pain" style="margin-bottom:16px">
+        <div class="atv-pain-icon">💬</div>
+        <div>
+          <div class="atv-pain-title">Customers unreachable by phone during the day</div>
+          <div class="atv-pain-desc">A customer in a meeting can't take a call but can read a message in 30 seconds. The in-app messaging thread with the advisor means approvals, questions, and updates happen faster — reducing hold time in the bay and getting cars out sooner.</div>
+        </div>
+      </div>
+
+      <div class="atv-sec">The Numbers</div>
+      <div class="atv-roi-grid">
+        <div class="atv-roi-cell">
+          <div class="atv-roi-num">62%</div>
+          <div class="atv-roi-label">Fewer inbound status calls per RO</div>
+        </div>
+        <div class="atv-roi-cell">
+          <div class="atv-roi-num">+$84</div>
+          <div class="atv-roi-label">Average upsell increase per RO with in-app approval</div>
+        </div>
+        <div class="atv-roi-cell">
+          <div class="atv-roi-num">0</div>
+          <div class="atv-roi-label">Disputed approvals with timestamped digital RO</div>
+        </div>
+        <div class="atv-roi-cell">
+          <div class="atv-roi-num">1 link</div>
+          <div class="atv-roi-label">Sent at check-in — no app download needed</div>
+        </div>
+      </div>
+
+      <div class="atv-sec">What's Included</div>
+      <div style="background:var(--panel);border-radius:4px;padding:4px 14px;margin-bottom:16px">
+        <div class="atv-feature-row"><span class="atv-check">✓</span>Live service pipeline — customer sees every stage in real time</div>
+        <div class="atv-feature-row"><span class="atv-check">✓</span>Digital service ticket with one-tap approve / decline per item</div>
+        <div class="atv-feature-row"><span class="atv-check">✓</span>Running cost total updates as items are approved</div>
+        <div class="atv-feature-row"><span class="atv-check">✓</span>Declined work flagged with mileage trigger for next visit</div>
+        <div class="atv-feature-row"><span class="atv-check">✓</span>Full service history with mileage and totals</div>
+        <div class="atv-feature-row"><span class="atv-check">✓</span>Direct messaging thread with service advisor</div>
+        <div class="atv-feature-row"><span class="atv-check">✓</span>Branded to your dealership — name, logo, colors</div>
+        <div class="atv-feature-row"><span class="atv-check">✓</span>Works offline — no WiFi needed in the waiting area</div>
+      </div>
+
+      <div class="atv-cta">
+        <div class="atv-cta-headline">Want to see it for your service drive?</div>
+        <div class="atv-cta-sub">We'll set up a live demo branded to your dealership with a real RO in 24 hours.</div>
+        <a class="atv-cta-btn" href="mailto:you@youremail.com?subject=AutoTrack Service Portal Demo">Get Your Demo</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  document.querySelectorAll('.at-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.at-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  let extraTotal = 0;
+
+  function approveItem(id, name, price) {
+    const el = document.getElementById(id);
+    el.classList.remove('recommend');
+    el.classList.add('approved');
+    el.querySelector('.ti-badges').innerHTML = '<span class="ti-badge approved">Approved</span>';
+    el.querySelector('.approve-row').remove();
+    extraTotal += price;
+    updateTotal();
+    showToast(name + ' approved — advisor notified');
+  }
+
+  function declineItem(id) {
+    const el = document.getElementById(id);
+    el.classList.remove('recommend');
+    el.classList.add('declined');
+    el.style.opacity = '0.6';
+    el.querySelector('.ti-badges').innerHTML = '<span class="ti-badge declined">Declined</span>';
+    el.querySelector('.approve-row').remove();
+    showToast('Declined — advisor notified');
+  }
+
+  function updateTotal() {
+    const base = 401 + extraTotal;
+    const tax = base * 0.0825;
+    const grand = base + tax;
+    document.getElementById('labor-sub').textContent = '$' + base.toFixed(0);
+    document.getElementById('tax-line').textContent = '$' + tax.toFixed(2);
+    document.getElementById('grand-total').textContent = '$' + grand.toFixed(2);
+  }
+
+  function sendMsg() {
+    const input = document.getElementById('msg-text');
+    const text = input.value.trim();
+    if (!text) return;
+    const wrap = document.getElementById('msg-list');
+    const now = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const div = document.createElement('div');
+    div.innerHTML = `<div class="msg-time right">${now}</div><div class="msg-bubble client">${text}</div>`;
+    wrap.appendChild(div);
+    input.value = '';
+    wrap.scrollTop = wrap.scrollHeight;
+    showToast('Message sent to Marcus');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+<style>.kw-watermark{position:fixed;bottom:12px;right:12px;z-index:99999;background:rgba(0,0,0,0.55);color:rgba(255,255,255,0.85);font-family:monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:5px 10px;border-radius:3px;pointer-events:none;backdrop-filter:blur(4px)}</style><div class="kw-watermark">Demo · klok-ventures.com</div></body>
+</html>

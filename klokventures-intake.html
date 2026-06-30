@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="klokventures-favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Start a Project — Klok Ventures</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@300;400;500;700&family=Sora:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0E0E10;
+  --dark: #16161A;
+  --panel: #1E1E24;
+  --blue: #2D6BE4;
+  --blue-dim: #1A4BA8;
+  --silver: #C8CAD0;
+  --white: #F2F0EC;
+  --muted: #6A6A76;
+  --divider: rgba(200,202,208,0.1);
+  --green: #2E8B4A;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Sora', sans-serif; background: var(--black); color: var(--white); line-height: 1.6; min-height: 100vh; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 56px;
+  background: rgba(14,14,16,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--divider);
+}
+.nav-logo { font-family: 'Azeret Mono', monospace; font-size: 16px; font-weight: 700; color: var(--white); letter-spacing: 0.04em; text-decoration: none; }
+.nav-logo span { color: var(--blue); }
+.nav-clock { font-family: 'Azeret Mono', monospace; font-size: 13px; color: var(--muted); letter-spacing: 0.1em; }
+.nav-cta { font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); border: 1px solid var(--blue); padding: 7px 14px; text-decoration: none; transition: background 0.15s, color 0.15s; }
+.nav-cta:hover { background: var(--blue); color: white; }
+
+/* HERO */
+.hero {
+  min-height: 38vh; display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 80px 24px 44px; position: relative; overflow: hidden;
+}
+.hero-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(var(--divider) 1px, transparent 1px), linear-gradient(90deg, var(--divider) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.3) 80%, transparent 100%);
+}
+.hero-eyebrow { font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; }
+.hero-title { font-size: clamp(28px, 6vw, 52px); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; color: var(--white); margin-bottom: 14px; }
+.hero-title em { font-style: normal; color: var(--blue); }
+.hero-sub { font-size: 14px; font-weight: 300; color: var(--silver); max-width: 520px; line-height: 1.7; }
+
+/* PROGRESS BAR */
+.progress-bar-wrap {
+  background: var(--dark); border-bottom: 1px solid var(--divider);
+  padding: 0; position: sticky; top: 56px; z-index: 50;
+}
+.progress-steps {
+  display: flex; max-width: 860px; margin: 0 auto;
+}
+.progress-step {
+  flex: 1; padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+  border-right: 1px solid var(--divider); cursor: pointer;
+  transition: background 0.15s;
+}
+.progress-step:last-child { border-right: none; }
+.progress-step.active { background: rgba(45,107,228,0.08); }
+.progress-step.done { cursor: pointer; }
+.step-num {
+  width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 700;
+  flex-shrink: 0; background: var(--panel); color: var(--muted); border: 1px solid var(--divider);
+  transition: all 0.2s;
+}
+.progress-step.active .step-num { background: var(--blue); color: white; border-color: var(--blue); }
+.progress-step.done .step-num { background: var(--green); color: white; border-color: var(--green); font-size: 11px; }
+.step-text { font-family: 'Azeret Mono', monospace; font-size: 9px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); line-height: 1.3; }
+.progress-step.active .step-text { color: var(--blue); }
+.progress-step.done .step-text { color: var(--silver); }
+
+/* FORM BODY */
+.form-wrap { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+/* PANELS */
+.form-panel { display: none; }
+.form-panel.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* SECTION LABEL */
+.form-section-label {
+  font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--blue);
+  margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--divider);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.form-section-num { color: var(--muted); }
+
+/* FIELD */
+.field-group { margin-bottom: 24px; }
+.field-label {
+  font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 500;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--silver);
+  margin-bottom: 8px; display: block;
+}
+.field-label .req { color: var(--blue); margin-left: 3px; }
+.field-hint { font-size: 11px; font-weight: 300; color: var(--muted); margin-bottom: 8px; display: block; line-height: 1.5; }
+.field-input {
+  width: 100%; background: var(--dark); border: 1px solid var(--divider);
+  color: var(--white); font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 300;
+  padding: 12px 14px; outline: none; transition: border-color 0.15s;
+  appearance: none; border-radius: 0;
+}
+.field-input:focus { border-color: var(--blue); }
+.field-input::placeholder { color: var(--muted); }
+textarea.field-input { resize: vertical; min-height: 100px; line-height: 1.6; }
+select.field-input { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236A6A76' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+/* FIELD GRID */
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* CHIP SELECT */
+.chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase; padding: 8px 14px;
+  border: 1px solid var(--divider); color: var(--muted); cursor: pointer;
+  transition: all 0.15s; user-select: none; background: var(--dark);
+}
+.chip:hover { border-color: var(--silver); color: var(--silver); }
+.chip.selected { border-color: var(--blue); color: var(--blue); background: rgba(45,107,228,0.1); }
+.chip.selected-green { border-color: var(--green); color: #4CAF70; background: rgba(46,139,74,0.1); }
+
+/* SCALE */
+.scale-wrap { display: flex; gap: 6px; align-items: center; }
+.scale-btn {
+  flex: 1; padding: 10px 4px; text-align: center;
+  font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 700;
+  border: 1px solid var(--divider); color: var(--muted); cursor: pointer;
+  background: var(--dark); transition: all 0.15s; user-select: none;
+}
+.scale-btn:hover { border-color: var(--silver); color: var(--silver); }
+.scale-btn.selected { border-color: var(--blue); color: var(--white); background: var(--blue); }
+.scale-labels { display: flex; justify-content: space-between; margin-top: 6px; }
+.scale-label { font-family: 'Azeret Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 0.08em; }
+
+/* DIVIDER */
+.form-divider { border: none; border-top: 1px solid var(--divider); margin: 28px 0; }
+
+/* NAV BUTTONS */
+.btn-row { display: flex; gap: 12px; justify-content: space-between; align-items: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--divider); }
+.btn-primary {
+  font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; background: var(--blue);
+  color: white; border: none; padding: 14px 28px; cursor: pointer; transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--blue-dim); }
+.btn-ghost {
+  font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; background: transparent;
+  color: var(--silver); border: 1px solid var(--divider); padding: 14px 28px;
+  cursor: pointer; transition: border-color 0.15s, color 0.15s;
+}
+.btn-ghost:hover { border-color: var(--silver); color: var(--white); }
+
+/* REVIEW PANEL */
+.review-block { background: var(--dark); border: 1px solid var(--divider); margin-bottom: 10px; }
+.review-block-header {
+  font-family: 'Azeret Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--blue);
+  padding: 10px 14px; border-bottom: 1px solid var(--divider);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.review-edit { font-size: 9px; color: var(--muted); cursor: pointer; transition: color 0.15s; }
+.review-edit:hover { color: var(--white); }
+.review-row { display: flex; gap: 16px; padding: 10px 14px; border-bottom: 1px solid var(--divider); }
+.review-row:last-child { border-bottom: none; }
+.review-key { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; flex-shrink: 0; width: 160px; padding-top: 1px; }
+.review-val { font-size: 13px; font-weight: 300; color: var(--silver); line-height: 1.55; }
+.review-val.empty { color: var(--muted); font-style: italic; }
+
+/* SUCCESS */
+.success-panel { display: none; text-align: center; padding: 60px 24px; }
+.success-panel.active { display: block; animation: fadeIn 0.3s ease; }
+.success-icon { font-size: 48px; margin-bottom: 20px; }
+.success-title { font-size: 28px; font-weight: 700; color: var(--white); letter-spacing: -0.02em; margin-bottom: 12px; }
+.success-sub { font-size: 14px; font-weight: 300; color: var(--silver); line-height: 1.7; max-width: 480px; margin: 0 auto 32px; }
+.output-box {
+  background: var(--dark); border: 1px solid var(--divider); border-left: 3px solid var(--blue);
+  padding: 20px; text-align: left; margin-bottom: 16px; position: relative;
+}
+.output-box-label { font-family: 'Azeret Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
+.output-text { font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--silver); line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+.copy-btn {
+  position: absolute; top: 12px; right: 12px;
+  font-family: 'Azeret Mono', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; background: var(--panel);
+  color: var(--muted); border: 1px solid var(--divider); padding: 5px 10px;
+  cursor: pointer; transition: all 0.15s;
+}
+.copy-btn:hover { border-color: var(--blue); color: var(--blue); }
+.copy-btn.copied { border-color: var(--green); color: #4CAF70; }
+
+/* HIGHLIGHT */
+.info-box { background: var(--panel); border: 1px solid var(--divider); border-left: 3px solid var(--blue); padding: 14px 16px; margin-bottom: 24px; }
+.info-box p { font-size: 12px; font-weight: 300; color: var(--silver); line-height: 1.7; }
+.info-box strong { color: var(--white); font-weight: 600; }
+
+/* FOOTER */
+footer { background: var(--dark); border-top: 1px solid var(--divider); padding: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.footer-logo { font-family: 'Azeret Mono', monospace; font-size: 14px; font-weight: 700; color: var(--muted); text-decoration: none; }
+.footer-logo span { color: var(--blue); }
+.footer-copy { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; }
+
+@media (max-width: 640px) {
+  .nav-clock { display: none; }
+  .field-grid { grid-template-columns: 1fr; }
+  .progress-step { padding: 10px 8px; }
+  .step-text { display: none; }
+  .review-key { width: 120px; }
+  .scale-btn { padding: 8px 2px; font-size: 10px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html"><img src="klokventures-logo.png" alt="Klok Ventures" style="height:32px;width:32px;object-fit:contain;flex-shrink:0"> Klok<span>Ventures</span></a>
+  <div class="nav-clock" id="nav-clock">00:00:00</div>
+  <a class="nav-cta" href="index.html">← Back to Site</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-eyebrow">Klok Ventures · New Project</div>
+  <h1 class="hero-title">Tell me what's <em>slowing you down.</em></h1>
+  <p class="hero-sub">Fill this out and I'll come back with real ideas for fixing it — whether that's a custom app, a smarter spreadsheet, or just a clearer process. No assumptions, no generic pitch.</p>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap">
+  <div class="progress-steps">
+    <div class="progress-step active" id="step-tab-1" onclick="goToStep(1)">
+      <div class="step-num" id="step-num-1">1</div>
+      <div class="step-text">Your Business</div>
+    </div>
+    <div class="progress-step" id="step-tab-2" onclick="goToStep(2)">
+      <div class="step-num" id="step-num-2">2</div>
+      <div class="step-text">The Problem</div>
+    </div>
+    <div class="progress-step" id="step-tab-3" onclick="goToStep(3)">
+      <div class="step-num" id="step-num-3">3</div>
+      <div class="step-text">If a Tool</div>
+    </div>
+    <div class="progress-step" id="step-tab-4" onclick="goToStep(4)">
+      <div class="step-num" id="step-num-4">4</div>
+      <div class="step-text">Logistics</div>
+    </div>
+    <div class="progress-step" id="step-tab-5" onclick="goToStep(5)">
+      <div class="step-num" id="step-num-5">5</div>
+      <div class="step-text">Review</div>
+    </div>
+  </div>
+</div>
+
+<div class="form-wrap">
+
+  <!-- STEP 1: YOUR BUSINESS -->
+  <div class="form-panel active" id="panel-1">
+    <div class="form-section-label">
+      Your Business
+      <span class="form-section-num">01 / 04</span>
+    </div>
+
+    <div class="field-grid">
+      <div class="field-group">
+        <label class="field-label">Business Name <span class="req">*</span></label>
+        <input class="field-input" id="biz-name" type="text" placeholder="e.g. Riverside Roofing LLC">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Your Name <span class="req">*</span></label>
+        <input class="field-input" id="contact-name" type="text" placeholder="e.g. Sarah Chen">
+      </div>
+    </div>
+
+    <div class="field-grid">
+      <div class="field-group">
+        <label class="field-label">Your Email <span class="req">*</span></label>
+        <input class="field-input" id="contact-email" type="email" placeholder="you@yourbusiness.com">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Phone (optional)</label>
+        <input class="field-input" id="contact-phone" type="tel" placeholder="(555) 000-0000">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Industry <span class="req">*</span></label>
+      <span class="field-hint">Select the one that fits best — or choose Other and describe below.</span>
+      <div class="chip-group" id="industry-chips">
+        <div class="chip" onclick="selectChip(this,'industry')">🏗️ Construction / Trades</div>
+        <div class="chip" onclick="selectChip(this,'industry')">🏠 Real Estate</div>
+        <div class="chip" onclick="selectChip(this,'industry')">🍽️ Restaurant / Hospitality</div>
+        <div class="chip" onclick="selectChip(this,'industry')">💉 Med Spa / Wellness</div>
+        <div class="chip" onclick="selectChip(this,'industry')">🚙 Auto Dealership / Service</div>
+        <div class="chip" onclick="selectChip(this,'industry')">🌿 Event Venue / Catering</div>
+        <div class="chip" onclick="selectChip(this,'industry')">🏋️ Fitness / Personal Training</div>
+        <div class="chip" onclick="selectChip(this,'industry')">🛍️ Retail / Boutique</div>
+        <div class="chip" onclick="selectChip(this,'industry')">🏘️ Property Management</div>
+        <div class="chip" onclick="selectChip(this,'industry')">⚕️ Healthcare / Medical</div>
+        <div class="chip" onclick="selectChip(this,'industry')">⚖️ Legal / Professional Services</div>
+        <div class="chip" onclick="selectChip(this,'industry')">🔧 Other</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Business Description <span class="req">*</span></label>
+      <span class="field-hint">2–3 sentences. What do you do, who do you serve, how do you deliver your service?</span>
+      <textarea class="field-input" id="biz-description" placeholder="e.g. We're a 12-person roofing contractor in Grand Rapids. We do residential and commercial re-roofs, serving homeowners and property managers. Jobs range from 1 to 3 days and we run 3–4 crews simultaneously."></textarea>
+    </div>
+
+    <div class="field-grid">
+      <div class="field-group">
+        <label class="field-label">Business Size</label>
+        <select class="field-input" id="biz-size">
+          <option value="">Select...</option>
+          <option>Just me (solo operator)</option>
+          <option>2–5 people</option>
+          <option>6–15 people</option>
+          <option>16–50 people</option>
+          <option>50+ people</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Years in Business</label>
+        <select class="field-input" id="biz-age">
+          <option value="">Select...</option>
+          <option>Just starting out</option>
+          <option>Less than 1 year</option>
+          <option>1–3 years</option>
+          <option>3–10 years</option>
+          <option>10+ years</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <div></div>
+      <button class="btn-primary" onclick="nextStep(1)">Next — The Problem →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: THE PROBLEM -->
+  <div class="form-panel" id="panel-2">
+    <div class="form-section-label">
+      The Problem
+      <span class="form-section-num">02 / 04</span>
+    </div>
+
+    <div class="info-box">
+      <p>The best demos solve a real pain point. The more specific you are here, the more accurate the demo will be to what your business actually needs.</p>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">What's the biggest workflow problem you want to solve? <span class="req">*</span></label>
+      <span class="field-hint">Be specific. "Everything is on paper and we lose things" is better than "we need to go digital."</span>
+      <textarea class="field-input" id="main-problem" placeholder="e.g. Our foremen fill out daily logs on paper and email photos to the office. Half the time the logs get lost and we reconstruct everything at the end of the week from memory. It's caused two billing disputes this year." style="min-height:120px"></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Who currently has this problem? <span class="req">*</span></label>
+      <span class="field-hint">Which people in your business — or your customers — are affected?</span>
+      <div class="chip-group" id="who-chips">
+        <div class="chip" onclick="toggleChip(this)">You (the owner)</div>
+        <div class="chip" onclick="toggleChip(this)">Field / on-site staff</div>
+        <div class="chip" onclick="toggleChip(this)">Office / admin staff</div>
+        <div class="chip" onclick="toggleChip(this)">Sales team</div>
+        <div class="chip" onclick="toggleChip(this)">Your customers / clients</div>
+        <div class="chip" onclick="toggleChip(this)">Subcontractors / vendors</div>
+        <div class="chip" onclick="toggleChip(this)">Management / leadership</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">What are you using today to manage this? <span class="req">*</span></label>
+      <span class="field-hint">Don't hold back — "nothing" and "a notebook" are valid answers.</span>
+      <div class="chip-group" id="current-chips">
+        <div class="chip" onclick="toggleChip(this)">Paper / notebooks</div>
+        <div class="chip" onclick="toggleChip(this)">Spreadsheets</div>
+        <div class="chip" onclick="toggleChip(this)">Email</div>
+        <div class="chip" onclick="toggleChip(this)">Group text / WhatsApp</div>
+        <div class="chip" onclick="toggleChip(this)">Generic software (QuickBooks, etc.)</div>
+        <div class="chip" onclick="toggleChip(this)">Industry-specific software</div>
+        <div class="chip" onclick="toggleChip(this)">Nothing formal</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">What does this problem cost you? <span class="req">*</span></label>
+      <span class="field-hint">Time, money, lost customers, mistakes — anything that makes this worth fixing.</span>
+      <textarea class="field-input" id="cost-of-problem" placeholder="e.g. My foreman spends 2 hours every Friday reconstructing the week's logs. We've lost two clients because follow-up fell through the cracks. I estimate it costs us $1,500–$2,000/month in wasted time."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="prevStep(2)">← Back</button>
+      <button class="btn-primary" onclick="nextStep(2)">Next — Tool Details →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: THE APP -->
+  <div class="form-panel" id="panel-3">
+    <div class="form-section-label">
+      If It's a Custom Tool
+      <span class="form-section-num">03 / 04</span>
+    </div>
+
+    <div class="info-box">
+      <p>I won't know yet whether the right fix is an app, a spreadsheet, or something else — that's part of what I figure out. But if you already have a sense that custom software would help, these questions help me scope it. <strong>Skip anything that doesn't apply and I'll ask follow-up questions instead.</strong></p>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Who would use a tool like this?</label>
+      <span class="field-hint">Select all that apply.</span>
+      <div class="chip-group" id="users-chips">
+        <div class="chip" onclick="toggleChip(this)">Your employees / internal team</div>
+        <div class="chip" onclick="toggleChip(this)">Your customers / clients</div>
+        <div class="chip" onclick="toggleChip(this)">Both — internal and customer-facing</div>
+        <div class="chip" onclick="toggleChip(this)">Subcontractors / partners</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Roughly how many people would use it?</label>
+      <select class="field-input" id="user-count">
+        <option value="">Select...</option>
+        <option>Just me</option>
+        <option>2–5 people</option>
+        <option>6–20 people</option>
+        <option>20–100 people</option>
+        <option>100+ people</option>
+        <option>Hundreds of customers</option>
+        <option>Thousands of customers</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">What would it need to do?</label>
+      <span class="field-hint">Describe the core actions, if you have a sense of them. It's okay to be rough here — we'll refine it together.</span>
+      <textarea class="field-input" id="app-purpose" placeholder="e.g. Foremen open it on their phone to log daily crew hours, note what work was done, and attach photos. The office sees all logs in real time. At the end of a job they can export a PDF summary for the client." style="min-height:120px"></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Capabilities that might matter</label>
+      <span class="field-hint">Select anything that sounds relevant — doesn't need to be exact or final.</span>
+      <div class="chip-group" id="features-chips">
+        <div class="chip" onclick="toggleChip(this)">Photo / file upload</div>
+        <div class="chip" onclick="toggleChip(this)">Checklist / task tracking</div>
+        <div class="chip" onclick="toggleChip(this)">Scheduling / calendar</div>
+        <div class="chip" onclick="toggleChip(this)">Customer-facing booking</div>
+        <div class="chip" onclick="toggleChip(this)">Messaging / notifications</div>
+        <div class="chip" onclick="toggleChip(this)">Reporting / PDF export</div>
+        <div class="chip" onclick="toggleChip(this)">Invoicing / payments</div>
+        <div class="chip" onclick="toggleChip(this)">Inventory / equipment tracking</div>
+        <div class="chip" onclick="toggleChip(this)">Customer portal / login</div>
+        <div class="chip" onclick="toggleChip(this)">Loyalty / rewards program</div>
+        <div class="chip" onclick="toggleChip(this)">Approval / sign-off workflows</div>
+        <div class="chip" onclick="toggleChip(this)">Offline capability</div>
+        <div class="chip" onclick="toggleChip(this)">Admin dashboard</div>
+        <div class="chip" onclick="toggleChip(this)">Map / location</div>
+      </div>
+    </div>
+
+    <hr class="form-divider">
+
+    <div class="field-group">
+      <label class="field-label">Branding & Visual Style</label>
+      <span class="field-hint">If we end up building something visual, how should it feel?</span>
+      <div class="chip-group" id="style-chips">
+        <div class="chip" onclick="selectChip(this,'style')">Clean & professional</div>
+        <div class="chip" onclick="selectChip(this,'style')">Bold & industrial</div>
+        <div class="chip" onclick="selectChip(this,'style')">Warm & approachable</div>
+        <div class="chip" onclick="selectChip(this,'style')">Premium & minimal</div>
+        <div class="chip" onclick="selectChip(this,'style')">Bright & energetic</div>
+        <div class="chip" onclick="selectChip(this,'style')">Dark & technical</div>
+      </div>
+    </div>
+
+    <div class="field-grid">
+      <div class="field-group">
+        <label class="field-label">Primary Brand Color</label>
+        <span class="field-hint">Hex code or just describe it.</span>
+        <input class="field-input" id="brand-color" type="text" placeholder="e.g. #1A4BA8 or 'navy blue'">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Business Name</label>
+        <span class="field-hint">What name should appear if we build something with your branding?</span>
+        <input class="field-input" id="demo-name" type="text" placeholder="e.g. Riverside Roofing">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Anything else about the look or feel?</label>
+      <textarea class="field-input" id="style-notes" placeholder="e.g. We use orange and dark gray. Our logo is a roof outline. We want it to feel rugged and professional, not corporate."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="prevStep(3)">← Back</button>
+      <button class="btn-primary" onclick="nextStep(3)">Next — Logistics →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: LOGISTICS -->
+  <div class="form-panel" id="panel-4">
+    <div class="form-section-label">
+      Logistics
+      <span class="form-section-num">04 / 04</span>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">How urgent is this for you?</label>
+      <div class="chip-group" id="urgency-chips">
+        <div class="chip" onclick="selectChip(this,'urgency')">🔥 Critical — I need this yesterday</div>
+        <div class="chip" onclick="selectChip(this,'urgency')">⚡ Soon — within the next month</div>
+        <div class="chip" onclick="selectChip(this,'urgency')">📅 Planning ahead — 1–3 months out</div>
+        <div class="chip" onclick="selectChip(this,'urgency')">🔭 Just exploring for now</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Budget range</label>
+      <span class="field-hint">Honest answers help me scope the right solution. There's no wrong answer — I'll tell you what's possible at each level.</span>
+      <div class="chip-group" id="budget-chips">
+        <div class="chip" onclick="selectChip(this,'budget')">Under $1,500</div>
+        <div class="chip" onclick="selectChip(this,'budget')">$1,500 – $3,500</div>
+        <div class="chip" onclick="selectChip(this,'budget')">$3,500 – $7,500</div>
+        <div class="chip" onclick="selectChip(this,'budget')">$7,500 – $15,000</div>
+        <div class="chip" onclick="selectChip(this,'budget')">$15,000+</div>
+        <div class="chip" onclick="selectChip(this,'budget')">Not sure yet</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Are you interested in ongoing maintenance?</label>
+      <span class="field-hint">A retainer means I handle hosting, updates, and new features monthly.</span>
+      <div class="chip-group" id="retainer-chips">
+        <div class="chip" onclick="selectChip(this,'retainer')">Yes — I want ongoing support</div>
+        <div class="chip" onclick="selectChip(this,'retainer')">Maybe — depends on cost</div>
+        <div class="chip" onclick="selectChip(this,'retainer')">No — just the build</div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Do you use any tools we'd need to integrate with?</label>
+      <span class="field-hint">e.g. QuickBooks, Square, Mindbody, Salesforce, a specific CRM, scheduling software, etc.</span>
+      <textarea class="field-input" id="integrations" placeholder="e.g. We use QuickBooks for billing and use a Google Calendar for scheduling. It would be great if the app could push to both."></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">How did you hear about Klok Ventures?</label>
+      <select class="field-input" id="referral">
+        <option value="">Select...</option>
+        <option>Someone referred me</option>
+        <option>Google search</option>
+        <option>LinkedIn</option>
+        <option>Cold email from Connor</option>
+        <option>Saw the demo app</option>
+        <option>Other</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Anything else you want me to know?</label>
+      <textarea class="field-input" id="anything-else" placeholder="Context, constraints, concerns, or anything that would help me build the right demo for you."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="prevStep(4)">← Back</button>
+      <button class="btn-primary" onclick="nextStep(4)">Review My Answers →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: REVIEW -->
+  <div class="form-panel" id="panel-5">
+    <div class="form-section-label">
+      Review & Submit
+      <span class="form-section-num">Almost done</span>
+    </div>
+
+    <div id="review-content"></div>
+
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="prevStep(5)">← Edit</button>
+      <button class="btn-primary" onclick="submitForm()">Generate My Prompt →</button>
+    </div>
+  </div>
+
+</div><!-- /form-wrap -->
+
+<!-- SUCCESS -->
+<div class="form-wrap success-panel" id="success-panel">
+  <div class="success-icon">⚡</div>
+  <div class="success-title">Your intake is ready.</div>
+  <div class="success-sub">Copy the summary below and send it to Connor — he'll review it, figure out the right fix, and follow up with real next steps.</div>
+
+  <div class="output-box">
+    <div class="output-box-label">Your Summary — Copy & Send to Connor</div>
+    <div class="output-text" id="output-text"></div>
+    <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copy</button>
+  </div>
+
+  <div style="background:var(--panel);border:1px solid var(--divider);padding:16px 20px;text-align:left;margin-top:8px">
+    <div style="font-family:'Azeret Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">What happens next</div>
+    <div style="font-size:13px;font-weight:300;color:var(--silver);line-height:1.7">
+      1. Copy the summary above and email it to <a href="mailto:cklok5174@gmail.com" style="color:var(--blue)">cklok5174@gmail.com</a> with subject line <strong style="color:var(--white)">"Project Inquiry"</strong><br>
+      2. Connor reviews it and comes back with real ideas — whether that's a working demo, a sample tool, or a clear plan<br>
+      3. We talk through what fits best, then move forward together
+    </div>
+  </div>
+</div>
+
+<footer>
+  <a class="footer-logo" href="index.html">Klok<span>Ventures</span></a>
+  <div class="footer-copy">© 2026 Connor Klok · All rights reserved</div>
+</footer>
+
+<script>
+// ── Clock ──────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('nav-clock').textContent = h+':'+m+':'+s;
+}
+updateClock(); setInterval(updateClock, 1000);
+
+// ── State ──────────────────────────────────────────────────────
+let currentStep = 1;
+const totalSteps = 5;
+
+// ── Chip helpers ───────────────────────────────────────────────
+function selectChip(el, group) {
+  document.querySelectorAll(`#${group}-chips .chip`).forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function toggleChip(el) {
+  el.classList.toggle('selected');
+}
+
+// ── Navigation ─────────────────────────────────────────────────
+function goToStep(n) {
+  if (n > currentStep) return; // can only go back via tabs
+  showStep(n);
+}
+
+function nextStep(from) {
+  if (!validateStep(from)) return;
+  markDone(from);
+  showStep(from + 1);
+}
+
+function prevStep(from) {
+  showStep(from - 1);
+}
+
+function showStep(n) {
+  document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + n).classList.add('active');
+  document.querySelectorAll('.progress-step').forEach((s,i) => {
+    s.classList.remove('active');
+    if (i + 1 === n) s.classList.add('active');
+  });
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (n === 5) buildReview();
+}
+
+function markDone(n) {
+  const num = document.getElementById('step-num-' + n);
+  const tab = document.getElementById('step-tab-' + n);
+  num.textContent = '✓';
+  tab.classList.add('done');
+}
+
+// ── Validation ─────────────────────────────────────────────────
+function validateStep(step) {
+  const required = {
+    1: ['biz-name','contact-name','contact-email','biz-description'],
+    2: ['main-problem','cost-of-problem'],
+    3: [],
+    4: []
+  };
+  const fields = required[step] || [];
+  let valid = true;
+
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) {
+      el.style.borderColor = '#C0332A';
+      el.focus();
+      valid = false;
+    } else {
+      el.style.borderColor = '';
+    }
+  });
+
+  // Check industry chip on step 1
+  if (step === 1) {
+    const hasIndustry = document.querySelector('#industry-chips .chip.selected');
+    if (!hasIndustry) {
+      document.getElementById('industry-chips').style.outline = '1px solid #C0332A';
+      valid = false;
+    } else {
+      document.getElementById('industry-chips').style.outline = '';
+    }
+  }
+
+  return valid;
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function getChips(groupId) {
+  return Array.from(document.querySelectorAll(`#${groupId} .chip.selected`))
+    .map(c => c.textContent.trim()).join(', ') || '—';
+}
+function val(id) { return document.getElementById(id)?.value?.trim() || '—'; }
+
+// ── Review ─────────────────────────────────────────────────────
+function buildReview() {
+  const sections = [
+    {
+      title: 'Your Business', step: 1,
+      rows: [
+        ['Business', val('biz-name')],
+        ['Contact', `${val('contact-name')} · ${val('contact-email')}${val('contact-phone') !== '—' ? ' · ' + val('contact-phone') : ''}`],
+        ['Industry', getChips('industry-chips')],
+        ['Description', val('biz-description')],
+        ['Size', val('biz-size')],
+        ['Years in business', val('biz-age')],
+      ]
+    },
+    {
+      title: 'The Problem', step: 2,
+      rows: [
+        ['Main problem', val('main-problem')],
+        ["Who's affected", getChips('who-chips')],
+        ['Current tools', getChips('current-chips')],
+        ['Cost of problem', val('cost-of-problem')],
+      ]
+    },
+    {
+      title: "If It's a Custom Tool", step: 3,
+      rows: [
+        ['App users', getChips('users-chips')],
+        ['User count', val('user-count')],
+        ['App purpose', val('app-purpose')],
+        ['Key features', getChips('features-chips')],
+        ['Visual style', getChips('style-chips')],
+        ['Brand color', val('brand-color')],
+        ['Demo name', val('demo-name')],
+        ['Style notes', val('style-notes')],
+      ]
+    },
+    {
+      title: 'Logistics', step: 4,
+      rows: [
+        ['Urgency', getChips('urgency-chips')],
+        ['Budget', getChips('budget-chips')],
+        ['Retainer interest', getChips('retainer-chips')],
+        ['Integrations', val('integrations')],
+        ['Referral', val('referral')],
+        ['Additional notes', val('anything-else')],
+      ]
+    }
+  ];
+
+  const html = sections.map(s => `
+    <div class="review-block">
+      <div class="review-block-header">
+        ${s.title}
+        <span class="review-edit" onclick="showStep(${s.step})">Edit →</span>
+      </div>
+      ${s.rows.map(([k,v]) => `
+        <div class="review-row">
+          <div class="review-key">${k}</div>
+          <div class="review-val ${v === '—' ? 'empty' : ''}">${v}</div>
+        </div>`).join('')}
+    </div>`).join('');
+
+  document.getElementById('review-content').innerHTML = html;
+}
+
+// ── Submit → Generate Prompt ───────────────────────────────────
+function submitForm() {
+  const industry = getChips('industry-chips');
+  const bizName = val('biz-name');
+  const contactName = val('contact-name');
+  const contactEmail = val('contact-email');
+  const bizDesc = val('biz-description');
+  const bizSize = val('biz-size');
+  const bizAge = val('biz-age');
+  const problem = val('main-problem');
+  const whoAffected = getChips('who-chips');
+  const currentTools = getChips('current-chips');
+  const costProblem = val('cost-of-problem');
+  const appUsers = getChips('users-chips');
+  const userCount = val('user-count');
+  const appPurpose = val('app-purpose');
+  const features = getChips('features-chips');
+  const style = getChips('style-chips');
+  const brandColor = val('brand-color');
+  const demoName = val('demo-name') !== '—' ? val('demo-name') : bizName;
+  const styleNotes = val('style-notes');
+  const urgency = getChips('urgency-chips');
+  const budget = getChips('budget-chips');
+  const retainer = getChips('retainer-chips');
+  const integrations = val('integrations');
+  const anythingElse = val('anything-else');
+
+  const hasAppDetails = appPurpose !== '—' || features !== '—';
+
+  const prompt = `NEW KLOK VENTURES CLIENT — FIND AND BUILD THE RIGHT SOLUTION
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CLIENT OVERVIEW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Business: ${bizName}
+Contact: ${contactName} (${contactEmail})
+Industry: ${industry}
+Size: ${bizSize}
+Years in business: ${bizAge}
+
+About the business:
+${bizDesc}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+THE PROBLEM TO SOLVE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Core workflow problem:
+${problem}
+
+Who is affected: ${whoAffected}
+Currently using: ${currentTools}
+
+Cost / impact of the problem:
+${costProblem}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IF A CUSTOM TOOL MAKES SENSE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Tool name: ${demoName}
+Who would use it: ${appUsers}
+Approx users: ${userCount}
+
+What it might need to do:
+${appPurpose}
+
+Capabilities that might matter: ${features}
+
+Integrations to consider: ${integrations}
+
+Visual style direction: ${style}
+Primary brand color: ${brandColor}
+Design notes: ${styleNotes}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROJECT CONTEXT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Urgency: ${urgency}
+Budget range: ${budget}
+Retainer interest: ${retainer}
+Additional notes: ${anythingElse}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+INSTRUCTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+First, analyze the problem above and recommend the right type of solution before building anything — a custom app, a spreadsheet/automation tool, a process change, or some combination. Briefly explain why.
+
+If a custom app or interactive tool is the right fit (or the client indicated interest in one above), build a single-file offline-capable HTML PWA demo that:
+
+1. Uses a visual design that fits the "${style}" style with "${brandColor}" as the primary accent color
+2. Shows the name "${demoName}" in the header
+3. Solves the specific problem described above — the tabs and features should reflect the actual workflow, not a generic template
+4. Includes realistic dummy data that mirrors this client's actual industry and business (use "${bizName}" context throughout)
+5. Features the relevant capabilities: ${features}
+6. Includes a "★ Why This Helps" tab that addresses the specific pain points described above and includes a CTA to contact cklok5174@gmail.com
+7. Adds a subtle "Demo · klok-ventures.com" watermark in the bottom-right corner
+8. Is fully functional with interactive elements — tappable, offline-capable, mobile-first
+9. Is delivered as a single self-contained HTML file
+
+If a spreadsheet, automation, or process fix is the better answer, describe that solution clearly instead — what it would look like, how it would work, and what it would take to build or implement it. Don't force an app where one isn't the right tool.`;
+
+  document.getElementById('output-text').textContent = prompt;
+
+  document.getElementById('panel-5').classList.remove('active');
+  document.getElementById('success-panel').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyPrompt() {
+  const text = document.getElementById('output-text').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenDoor — Property Tours</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1A1A1A;
+    --slate: #3D4B5C;
+    --gold: #B89B5E;
+    --gold-light: #D4B87A;
+    --mist: #F4F3F0;
+    --stone: #8C8C8C;
+    --white: #FFFFFF;
+    --sage: #4A6741;
+    --divider: #E8E5DF;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--mist);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    height: 280px;
+    overflow: hidden;
+    background: var(--slate);
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(26,26,26,0.2) 0%, rgba(26,26,26,0.75) 100%),
+      repeating-linear-gradient(
+        45deg,
+        #2A3540 0px, #2A3540 2px,
+        #2E3A46 2px, #2E3A46 20px
+      );
+  }
+  /* Architectural window silhouette */
+  .hero-art {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 180px;
+    opacity: 0.15;
+  }
+  .hero-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 24px 20px 20px;
+  }
+  .hero-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--gold);
+    color: #1A1A1A;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    width: fit-content;
+    margin-bottom: 10px;
+  }
+  .hero-address {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 1.15;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .hero-price {
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--gold-light);
+    letter-spacing: 0.01em;
+  }
+  .hero-price strong { font-weight: 600; }
+
+  /* QUICK STATS */
+  .quick-stats {
+    background: var(--white);
+    display: flex;
+    border-bottom: 1px solid var(--divider);
+  }
+  .qs-item {
+    flex: 1;
+    padding: 14px 8px;
+    text-align: center;
+    border-right: 1px solid var(--divider);
+  }
+  .qs-item:last-child { border-right: none; }
+  .qs-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .qs-key {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-top: 2px;
+  }
+
+  /* NAV */
+  .property-nav {
+    background: var(--white);
+    display: flex;
+    border-bottom: 2px solid var(--divider);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pnav-item {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--stone);
+    padding: 13px 16px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    user-select: none;
+  }
+  .pnav-item.active {
+    color: var(--ink);
+    border-bottom-color: var(--gold);
+  }
+
+  /* PANELS */
+  .main-content { flex: 1; }
+  .panel { display: none; padding: 20px 16px; }
+  .panel.active { display: block; }
+  .panel.no-pad { padding: 0; }
+
+  /* DETAILS PANEL */
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--divider);
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .detail-cell {
+    background: var(--white);
+    padding: 12px 14px;
+  }
+  .detail-key {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-bottom: 3px;
+  }
+  .detail-val {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .desc-card {
+    background: var(--white);
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 20px;
+    line-height: 1.65;
+    font-size: 14px;
+    color: var(--slate);
+  }
+
+  .feature-list {
+    list-style: none;
+    margin-bottom: 20px;
+  }
+  .feature-list li {
+    font-size: 14px;
+    color: var(--slate);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--divider);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .feature-list li::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+  .feature-list li:last-child { border-bottom: none; }
+
+  /* PHOTOS PANEL */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .photo-card {
+    aspect-ratio: 4/3;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s;
+  }
+  .photo-card:hover { transform: scale(0.98); }
+  .photo-card:active { transform: scale(0.95); }
+  .photo-card .room-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(26,26,26,0.65);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 6px 8px;
+  }
+
+  /* NOTES PANEL */
+  .agent-card {
+    background: var(--white);
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .agent-avatar {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--slate));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .agent-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .agent-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-top: 2px;
+  }
+  .agent-contact {
+    font-size: 13px;
+    color: var(--gold);
+    margin-top: 4px;
+    font-weight: 500;
+  }
+
+  .note-card {
+    background: var(--white);
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--gold);
+  }
+  .note-timestamp {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-bottom: 5px;
+  }
+  .note-text {
+    font-size: 14px;
+    color: var(--slate);
+    line-height: 1.55;
+  }
+
+  .notes-input-area {
+    background: var(--white);
+    border-radius: 4px;
+    border: 2px solid var(--divider);
+    padding: 14px;
+    margin-bottom: 12px;
+    transition: border-color 0.15s;
+  }
+  .notes-input-area:focus-within { border-color: var(--gold); }
+  .notes-textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    resize: none;
+    min-height: 72px;
+    line-height: 1.55;
+  }
+  .notes-textarea::placeholder { color: var(--stone); }
+
+  /* LEAD CAPTURE */
+  .cta-card {
+    background: var(--ink);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .cta-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .cta-sub {
+    font-size: 13px;
+    color: var(--stone);
+    margin-bottom: 16px;
+  }
+  .cta-field {
+    width: 100%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 3px;
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    margin-bottom: 8px;
+  }
+  .cta-field::placeholder { color: rgba(255,255,255,0.35); }
+  .cta-field:focus { border-color: var(--gold); }
+  .cta-btn {
+    width: 100%;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    padding: 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.15s;
+  }
+  .cta-btn:hover { background: var(--gold-light); }
+
+  .btn-save-note {
+    background: var(--ink);
+    color: var(--white);
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 9px 18px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-save-note:hover { background: var(--slate); }
+
+  /* SIMILAR LISTINGS */
+  .listing-card {
+    background: var(--white);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    display: flex;
+    gap: 0;
+  }
+  .listing-thumb {
+    width: 90px;
+    background: linear-gradient(135deg, #3D4B5C, #2A3540);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .listing-info { padding: 12px 14px; flex: 1; }
+  .listing-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .listing-addr {
+    font-size: 12px;
+    color: var(--stone);
+    margin-bottom: 6px;
+  }
+  .listing-meta {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--stone);
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: var(--gold-light);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 10px 20px;
+    border-radius: 4px;
+    z-index: 999;
+    transition: transform 0.25s ease;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* VALUE TAB */
+  .re-value { padding: 20px 16px 40px; background: var(--mist); }
+  .re-value-hero {
+    background: var(--white);
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--gold);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .re-value-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .re-value-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .re-value-sub {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--slate);
+    line-height: 1.65;
+  }
+  .re-section-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .re-pain-card {
+    background: var(--white);
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .re-pain-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .re-pain-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+  .re-pain-desc { font-size: 12px; color: var(--slate); line-height: 1.55; }
+  .re-roi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .re-roi-cell {
+    background: var(--white);
+    border-radius: 4px;
+    padding: 14px 12px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .re-roi-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .re-roi-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-top: 5px;
+    line-height: 1.4;
+  }
+  .re-feature-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--divider);
+    font-size: 13px;
+    color: var(--slate);
+  }
+  .re-feature-row:last-child { border-bottom: none; }
+  .re-check { color: var(--sage); font-weight: 600; flex-shrink: 0; margin-top: 1px; }
+  .re-cta-card {
+    background: var(--ink);
+    border-radius: 6px;
+    padding: 22px 20px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .re-cta-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .re-cta-sub { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 16px; line-height: 1.55; }
+  .re-cta-btn {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    padding: 12px 24px;
+    border-radius: 3px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-status">● Active Listing</div>
+    <div class="hero-address">2847 Halcyon Drive<br>Hillcrest, CA 92103</div>
+    <div class="hero-price"><strong>$1,485,000</strong></div>
+  </div>
+</div>
+
+<div class="quick-stats">
+  <div class="qs-item">
+    <div class="qs-val">4</div>
+    <div class="qs-key">Beds</div>
+  </div>
+  <div class="qs-item">
+    <div class="qs-val">3</div>
+    <div class="qs-key">Baths</div>
+  </div>
+  <div class="qs-item">
+    <div class="qs-val">2,640</div>
+    <div class="qs-key">Sq Ft</div>
+  </div>
+  <div class="qs-item">
+    <div class="qs-val">1962</div>
+    <div class="qs-key">Built</div>
+  </div>
+</div>
+
+<nav class="property-nav">
+  <div class="pnav-item active" data-tab="details">Details</div>
+  <div class="pnav-item" data-tab="photos">Photos</div>
+  <div class="pnav-item" data-tab="notes">My Notes</div>
+  <div class="pnav-item" data-tab="similar">Similar</div>
+  <div class="pnav-item" data-tab="value" style="color:var(--gold)">★ Why This App</div>
+</nav>
+
+<div class="main-content">
+
+  <!-- DETAILS -->
+  <div class="panel active" id="panel-details">
+    <div class="section-label">Property Information</div>
+    <div class="detail-grid">
+      <div class="detail-cell">
+        <div class="detail-key">Lot Size</div>
+        <div class="detail-val">7,200 sqft</div>
+      </div>
+      <div class="detail-cell">
+        <div class="detail-key">Price/sqft</div>
+        <div class="detail-val">$562</div>
+      </div>
+      <div class="detail-cell">
+        <div class="detail-key">Garage</div>
+        <div class="detail-val">2-car attached</div>
+      </div>
+      <div class="detail-cell">
+        <div class="detail-key">Days on Market</div>
+        <div class="detail-val">12 days</div>
+      </div>
+      <div class="detail-cell">
+        <div class="detail-key">HOA</div>
+        <div class="detail-val">None</div>
+      </div>
+      <div class="detail-cell">
+        <div class="detail-key">Schools</div>
+        <div class="detail-val">8/10 rated</div>
+      </div>
+    </div>
+
+    <div class="section-label">About This Home</div>
+    <div class="desc-card">
+      Beautifully updated mid-century modern in one of Hillcrest's most walkable pockets. Original hardwood floors refinished in 2022, chef's kitchen with Carrara marble countertops, and a primary suite with canyon views. The backyard is a true entertainer's sanctuary — covered pergola, gas firepit, and mature olive trees that give year-round privacy.
+    </div>
+
+    <div class="section-label">Highlights</div>
+    <ul class="feature-list">
+      <li>Owned solar — avg. $28/mo electric bill</li>
+      <li>New roof and HVAC (2021)</li>
+      <li>Permitted ADU in backyard — rental income potential</li>
+      <li>White oak cabinetry, Bosch appliance suite</li>
+      <li>Walking distance to University Ave shops</li>
+      <li>Natural light throughout — 14 skylights</li>
+    </ul>
+
+    <div class="section-label">Seller Disclosures</div>
+    <div style="background:var(--white);border-radius:4px;padding:4px 14px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--divider)">
+        <span style="color:var(--sage);font-weight:700;flex-shrink:0">✓</span>
+        <div style="font-size:13px;color:var(--slate)">No known roof leaks or water intrusion history</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--divider)">
+        <span style="color:var(--sage);font-weight:700;flex-shrink:0">✓</span>
+        <div style="font-size:13px;color:var(--slate)">HVAC serviced annually — last service March 2026</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--divider)">
+        <span style="color:#C9742A;font-weight:700;flex-shrink:0">!</span>
+        <div style="font-size:13px;color:var(--slate)">Hairline crack in garage slab — cosmetic, not structural per engineer report (2024)</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0">
+        <span style="color:var(--sage);font-weight:700;flex-shrink:0">✓</span>
+        <div style="font-size:13px;color:var(--slate)">No HOA disputes, no litigation history on property</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PHOTOS -->
+  <div class="panel" id="panel-photos">
+    <div class="section-label" style="margin-bottom:12px">16 Photos</div>
+    <div class="photo-grid">
+      <div class="photo-card" style="background:linear-gradient(135deg,#3D4B5C,#2A3540)" onclick="showToast('Full screen view')">
+        🏠
+        <div class="room-label">Exterior</div>
+      </div>
+      <div class="photo-card" style="background:linear-gradient(135deg,#4A3B2A,#3A2E22)" onclick="showToast('Full screen view')">
+        🛋️
+        <div class="room-label">Living Room</div>
+      </div>
+      <div class="photo-card" style="background:linear-gradient(135deg,#2A3A2E,#1E2E22)" onclick="showToast('Full screen view')">
+        🍳
+        <div class="room-label">Kitchen</div>
+      </div>
+      <div class="photo-card" style="background:linear-gradient(135deg,#3A3040,#2A2030)" onclick="showToast('Full screen view')">
+        🛏️
+        <div class="room-label">Primary Suite</div>
+      </div>
+      <div class="photo-card" style="background:linear-gradient(135deg,#2A3840,#1E2E38)" onclick="showToast('Full screen view')">
+        🛁
+        <div class="room-label">Ensuite Bath</div>
+      </div>
+      <div class="photo-card" style="background:linear-gradient(135deg,#3A3A28,#2A2A18)" onclick="showToast('Full screen view')">
+        🌿
+        <div class="room-label">Backyard</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="panel" id="panel-notes">
+    <div class="agent-card">
+      <div class="agent-avatar">SC</div>
+      <div>
+        <div class="agent-name">Sarah Chen</div>
+        <div class="agent-title">Listing Agent · DRE #01923847</div>
+        <div class="agent-contact">619-555-0182</div>
+      </div>
+    </div>
+
+    <div class="section-label">Your Tour Notes</div>
+
+    <div class="notes-input-area">
+      <textarea class="notes-textarea" id="note-input" placeholder="Tap to add notes from your tour…"></textarea>
+    </div>
+    <button class="btn-save-note" onclick="saveNote()" style="margin-bottom:20px">Save Note</button>
+
+    <div id="note-list">
+      <div class="note-card">
+        <div class="note-timestamp">Today · 2:14 PM</div>
+        <div class="note-text">Kitchen is stunning in person — marble counters look much better than photos. Backyard ADU is fully finished, could easily rent for $1,800/mo. Parking was easy.</div>
+      </div>
+      <div class="note-card">
+        <div class="note-timestamp">Today · 2:31 PM</div>
+        <div class="note-text">One concern: the primary closet is smaller than expected. Also noticed a hairline crack in the garage slab — worth flagging for inspection.</div>
+      </div>
+    </div>
+
+    <div class="cta-card">
+      <div class="cta-headline">Sign In as Visitor</div>
+      <div class="cta-sub">Agent receives your info instantly</div>
+      <input class="cta-field" id="signin-name" type="text" placeholder="Your name">
+      <input class="cta-field" id="signin-phone" type="tel" placeholder="Phone or email">
+      <button class="cta-btn" onclick="submitSignin()">Sign In</button>
+    </div>
+
+    <div class="cta-card" style="margin-top:12px">
+      <div class="cta-headline">Schedule a Second Showing</div>
+      <div class="cta-sub">We'll confirm within 30 minutes</div>
+      <input class="cta-field" id="lead-name" type="text" placeholder="Your name">
+      <input class="cta-field" id="lead-phone" type="tel" placeholder="Phone number">
+      <input class="cta-field" id="lead-date" type="text" placeholder="Preferred date & time">
+      <button class="cta-btn" onclick="submitLead()">Request Showing</button>
+    </div>
+  </div>
+
+  <!-- SIMILAR -->
+  <div class="panel" id="panel-similar">
+    <div class="section-label">Similar Homes Nearby</div>
+
+    <div class="listing-card">
+      <div class="listing-thumb">🏡</div>
+      <div class="listing-info">
+        <div class="listing-price">$1,325,000</div>
+        <div class="listing-addr">1902 Myrtle Ave, Hillcrest</div>
+        <div class="listing-meta">3 bd · 2 ba · 2,180 sqft</div>
+      </div>
+    </div>
+    <div class="listing-card">
+      <div class="listing-thumb">🏠</div>
+      <div class="listing-info">
+        <div class="listing-price">$1,550,000</div>
+        <div class="listing-addr">3014 Upas St, North Park</div>
+        <div class="listing-meta">4 bd · 3 ba · 2,780 sqft</div>
+      </div>
+    </div>
+    <div class="listing-card">
+      <div class="listing-thumb">🏘️</div>
+      <div class="listing-info">
+        <div class="listing-price">$1,195,000</div>
+        <div class="listing-addr">744 Robinson Ave, Hillcrest</div>
+        <div class="listing-meta">3 bd · 2 ba · 1,920 sqft</div>
+      </div>
+    </div>
+    <div class="listing-card">
+      <div class="listing-thumb">🏡</div>
+      <div class="listing-info">
+        <div class="listing-price">$1,675,000</div>
+        <div class="listing-addr">2210 Goldfinch St, Mission Hills</div>
+        <div class="listing-meta">4 bd · 3.5 ba · 3,100 sqft</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUE PANEL -->
+  <div class="panel no-pad" id="panel-value">
+    <div class="re-value">
+
+      <div class="re-value-hero">
+        <div class="re-value-eyebrow">Built for Real Estate Professionals</div>
+        <div class="re-value-headline">Win more buyers, capture every lead, and close faster — with one link instead of a stack of paper.</div>
+        <div class="re-value-sub">OpenDoor turns every showing into a polished digital experience. Buyers get the full picture on their phone. You get their contact the moment they walk in. And your brand stays in their pocket long after the tour.</div>
+      </div>
+
+      <div class="re-section-title">Pain Points This Eliminates</div>
+
+      <div class="re-pain-card">
+        <div class="re-pain-icon">👻</div>
+        <div>
+          <div class="re-pain-title">Buyers ghost after the open house</div>
+          <div class="re-pain-desc">The visitor sign-in form captures contact info the moment someone walks through the door — no clipboard, no hoping they drop a card. The agent gets notified instantly and has a name and number to follow up within the hour while interest is still hot.</div>
+        </div>
+      </div>
+      <div class="re-pain-card">
+        <div class="re-pain-icon">❓</div>
+        <div>
+          <div class="re-pain-title">"What's wrong with it?" — buyers don't trust what they can't see</div>
+          <div class="re-pain-desc">Proactively showing disclosures in the app — including the flagged garage slab crack — builds trust and pre-empts the most common objection. Buyers who feel informed make faster decisions and are less likely to pull out after inspection.</div>
+        </div>
+      </div>
+      <div class="re-pain-card">
+        <div class="re-pain-icon">🏘️</div>
+        <div>
+          <div class="re-pain-title">Buyers comparing on Zillow instead of with you</div>
+          <div class="re-pain-desc">The Similar Listings tab keeps buyers in your ecosystem, curated by you — not surfaced by an algorithm that shows your competitors. The comparison stays on your terms, and every listing they click back through keeps your brand visible.</div>
+        </div>
+      </div>
+      <div class="re-pain-card">
+        <div class="re-pain-icon">📄</div>
+        <div>
+          <div class="re-pain-title">Paper flyers forgotten within hours</div>
+          <div class="re-pain-desc">A printed flyer competes with everything else in a buyer's bag. A saved app on their phone surfaces every time they open their browser. Your listing stays top of mind with full details, photos, and direct contact — all offline-capable.</div>
+        </div>
+      </div>
+      <div class="re-pain-card">
+        <div class="re-pain-icon">🗒️</div>
+        <div>
+          <div class="re-pain-title">Buyers can't remember what they liked about each house</div>
+          <div class="re-pain-desc">After touring six homes in a weekend, they blur together. The My Notes tab lets buyers capture impressions, concerns, and observations room by room during the tour — so when they revisit the listing at 10 PM, their own words remind them why this one stood out.</div>
+        </div>
+      </div>
+      <div class="re-pain-card" style="margin-bottom:20px">
+        <div class="re-pain-icon">📶</div>
+        <div>
+          <div class="re-pain-title">Properties with weak signal make digital tools fail</div>
+          <div class="re-pain-desc">Rural properties, thick-walled estates, and basements all kill connectivity. OpenDoor is fully offline-capable — the entire listing loads from cache so buyers can explore photos, details, and make notes even without a bar of signal.</div>
+        </div>
+      </div>
+
+      <div class="re-section-title">The Numbers</div>
+      <div class="re-roi-grid">
+        <div class="re-roi-cell">
+          <div class="re-roi-num">3×</div>
+          <div class="re-roi-label">More buyer engagement vs. print flyers</div>
+        </div>
+        <div class="re-roi-cell">
+          <div class="re-roi-num">100%</div>
+          <div class="re-roi-label">Open house visitors captured with sign-in</div>
+        </div>
+        <div class="re-roi-cell">
+          <div class="re-roi-num">1 link</div>
+          <div class="re-roi-label">Send via text or email — no download required</div>
+        </div>
+        <div class="re-roi-cell">
+          <div class="re-roi-num">24h</div>
+          <div class="re-roi-label">To build and deploy your listing app</div>
+        </div>
+      </div>
+
+      <div class="re-section-title">What's Included</div>
+      <div style="background:var(--white);border-radius:4px;padding:4px 14px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
+        <div class="re-feature-row"><span class="re-check">✓</span>Full property detail view with photos, highlights, and specs</div>
+        <div class="re-feature-row"><span class="re-check">✓</span>Seller disclosures tab — builds trust, reduces surprises</div>
+        <div class="re-feature-row"><span class="re-check">✓</span>Open house visitor sign-in with instant agent notification</div>
+        <div class="re-feature-row"><span class="re-check">✓</span>Buyer tour note-taking — saved on their device</div>
+        <div class="re-feature-row"><span class="re-check">✓</span>Second showing request form — captured in-moment</div>
+        <div class="re-feature-row"><span class="re-check">✓</span>Comparable listings curated by you — not Zillow's algorithm</div>
+        <div class="re-feature-row"><span class="re-check">✓</span>Agent profile and direct contact always visible</div>
+        <div class="re-feature-row"><span class="re-check">✓</span>Works offline — no signal needed at the property</div>
+        <div class="re-feature-row"><span class="re-check">✓</span>QR code for open house signage — instant access</div>
+      </div>
+
+      <div class="re-cta-card">
+        <div class="re-cta-headline">Want this for your next listing?</div>
+        <div class="re-cta-sub">We'll build a live version for your property in 24 hours. Custom photos, your branding, your disclosures, your comparables.</div>
+        <a class="re-cta-btn" href="mailto:you@youremail.com?subject=OpenDoor Listing App Demo">Request a Live Demo</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  document.querySelectorAll('.pnav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.pnav-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      item.classList.add('active');
+      document.getElementById('panel-' + item.dataset.tab).classList.add('active');
+    });
+  });
+
+  function saveNote() {
+    const text = document.getElementById('note-input').value.trim();
+    if (!text) return;
+    const now = new Date();
+    const timeStr = 'Today · ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const card = document.createElement('div');
+    card.className = 'note-card';
+    card.innerHTML = `<div class="note-timestamp">${timeStr}</div><div class="note-text">${text}</div>`;
+    document.getElementById('note-list').insertBefore(card, document.getElementById('note-list').firstChild);
+    document.getElementById('note-input').value = '';
+    showToast('Note saved');
+  }
+
+  function submitSignin() {
+    const name = document.getElementById('signin-name').value.trim();
+    if (!name) { showToast('Please enter your name'); return; }
+    document.getElementById('signin-name').value = '';
+    document.getElementById('signin-phone').value = '';
+    showToast('Welcome, ' + name + ' — Sarah has been notified');
+  }
+
+  function submitLead() {
+    const name = document.getElementById('lead-name').value.trim();
+    if (!name) { showToast('Please enter your name'); return; }
+    document.getElementById('lead-name').value = '';
+    document.getElementById('lead-phone').value = '';
+    document.getElementById('lead-date').value = '';
+    showToast('Request sent — Sarah will call you shortly');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+<style>.kw-watermark{position:fixed;bottom:12px;right:12px;z-index:99999;background:rgba(0,0,0,0.55);color:rgba(255,255,255,0.85);font-family:monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:5px 10px;border-radius:3px;pointer-events:none;backdrop-filter:blur(4px)}</style><div class="kw-watermark">Demo · klok-ventures.com</div></body>
+</html>

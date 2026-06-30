@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thistle & Vine — Event Portal</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,600;1,6..96,400;1,6..96,600&family=Work+Sans:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ivory: #FAF7F2;
+  --parchment: #F0EBE1;
+  --champagne: #C9A84C;
+  --champagne-light: #D9C070;
+  --forest: #1E3028;
+  --forest-mid: #2A4035;
+  --blush: #EDD5C8;
+  --warm-black: #1A1814;
+  --stone: #8A8070;
+  --ink: #2A2418;
+  --divider: rgba(42,36,24,0.1);
+  --green: #3A6B4A;
+}
+
+body { font-family: 'Work Sans', sans-serif; background: var(--ivory); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* HEADER */
+.ev-header {
+  background: var(--forest); padding: 18px 20px 14px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.ev-venue-name { font-family: 'Bodoni Moda', serif; font-size: 22px; color: var(--ivory); letter-spacing: 0.02em; }
+.ev-venue-sub { font-size: 9px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--champagne); margin-top: 3px; }
+.ev-days-badge {
+  text-align: right;
+}
+.ev-days-num { font-family: 'Bodoni Moda', serif; font-size: 32px; color: var(--champagne); line-height: 1; }
+.ev-days-label { font-size: 8px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(201,168,76,0.6); }
+
+/* EVENT HERO CARD */
+.event-hero {
+  background: linear-gradient(160deg, var(--forest-mid), var(--forest));
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.eh-eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--champagne); margin-bottom: 6px; }
+.eh-event-name { font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 26px; color: var(--ivory); line-height: 1.15; margin-bottom: 4px; }
+.eh-couple { font-size: 13px; font-weight: 300; color: rgba(250,247,242,0.7); margin-bottom: 12px; letter-spacing: 0.04em; }
+.eh-detail-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.eh-detail { font-size: 11px; font-weight: 500; color: rgba(201,168,76,0.8); display: flex; align-items: center; gap: 5px; }
+
+/* PROGRESS RINGS */
+.budget-strip {
+  background: var(--parchment); padding: 14px 16px;
+  display: flex; gap: 0; border-bottom: 1px solid var(--divider);
+}
+.bs-item { flex: 1; text-align: center; padding: 0 8px; border-right: 1px solid var(--divider); }
+.bs-item:last-child { border-right: none; }
+.bs-val { font-family: 'Bodoni Moda', serif; font-size: 20px; color: var(--forest); line-height: 1; }
+.bs-val.warn { color: #B8621A; }
+.bs-label { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--stone); margin-top: 3px; }
+
+/* TABS */
+.ev-tabs {
+  background: var(--forest); display: flex;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.ev-tab {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(201,168,76,0.5); padding: 12px 16px; cursor: pointer;
+  border-bottom: 2px solid transparent; white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s; user-select: none;
+}
+.ev-tab.active { color: var(--champagne); border-bottom-color: var(--champagne); }
+
+/* PANELS */
+.ev-content { flex: 1; }
+.panel { display: none; padding: 20px 16px; }
+.panel.active { display: block; }
+.panel.no-pad { padding: 0; }
+
+/* SHARED */
+.sec-label {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--stone); margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--divider);
+}
+
+/* TIMELINE */
+.timeline-item {
+  display: flex; gap: 0; margin-bottom: 0;
+}
+.tl-time-col { width: 60px; flex-shrink: 0; padding-top: 2px; }
+.tl-time { font-family: 'Bodoni Moda', serif; font-size: 13px; color: var(--champagne); font-weight: 600; }
+.tl-ampm { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; color: var(--stone); }
+.tl-line-col { width: 28px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
+.tl-dot {
+  width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+  border: 2px solid var(--champagne); background: var(--ivory);
+}
+.tl-dot.done { background: var(--champagne); border-color: var(--champagne); }
+.tl-dot.now { background: var(--forest); border-color: var(--forest); box-shadow: 0 0 0 3px rgba(30,48,40,0.2); }
+.tl-vert { flex: 1; width: 1px; background: var(--divider); margin: 4px 0; min-height: 32px; }
+.tl-body { flex: 1; padding-bottom: 20px; }
+.tl-title { font-family: 'Bodoni Moda', serif; font-size: 15px; color: var(--forest); margin-bottom: 2px; }
+.tl-title.now { color: var(--champagne); }
+.tl-desc { font-size: 11px; font-weight: 300; color: var(--stone); line-height: 1.5; }
+.tl-vendor { display: inline-block; font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--green); background: rgba(58,107,74,0.1); padding: 2px 8px; border-radius: 20px; margin-top: 5px; }
+
+/* VENDORS */
+.vendor-card {
+  background: white; border: 1px solid var(--divider); border-radius: 6px;
+  padding: 14px 16px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start;
+}
+.vc-avatar {
+  width: 40px; height: 40px; border-radius: 50%; background: var(--forest);
+  display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+.vc-info { flex: 1; }
+.vc-role { font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--champagne); margin-bottom: 2px; }
+.vc-name { font-family: 'Bodoni Moda', serif; font-size: 16px; color: var(--forest); margin-bottom: 2px; }
+.vc-detail { font-size: 11px; font-weight: 300; color: var(--stone); }
+.vc-status {
+  display: inline-block; font-size: 9px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 20px; margin-top: 5px;
+}
+.vc-status.confirmed { background: rgba(58,107,74,0.1); color: var(--green); }
+.vc-status.pending { background: rgba(184,98,26,0.1); color: #B8621A; }
+.vc-action { align-self: center; }
+.vc-btn {
+  font-size: 11px; font-weight: 600; color: var(--forest); background: var(--parchment);
+  border: 1px solid var(--divider); padding: 6px 12px; border-radius: 20px;
+  cursor: pointer; white-space: nowrap;
+}
+
+/* CHECKLIST */
+.check-group { margin-bottom: 16px; }
+.check-group-title { font-family: 'Bodoni Moda', serif; font-size: 15px; color: var(--forest); margin-bottom: 8px; }
+.check-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 0;
+  border-bottom: 1px solid var(--divider); cursor: pointer; user-select: none;
+}
+.check-item:last-child { border-bottom: none; }
+.ci-box {
+  width: 20px; height: 20px; border-radius: 4px; border: 1.5px solid var(--divider);
+  background: white; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; flex-shrink: 0; transition: all 0.15s;
+}
+.check-item.done .ci-box { background: var(--forest); border-color: var(--forest); color: white; }
+.ci-text { font-size: 13px; color: var(--ink); }
+.check-item.done .ci-text { text-decoration: line-through; color: var(--stone); }
+.ci-due { font-size: 10px; font-weight: 600; color: var(--stone); margin-left: auto; }
+.ci-due.overdue { color: #B8621A; }
+
+/* VALUE PANEL */
+.ev-value { padding: 20px 16px 40px; }
+.evv-hero { background: var(--forest); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+.evv-eyebrow { font-size: 9px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--champagne); margin-bottom: 8px; }
+.evv-headline { font-family: 'Bodoni Moda', serif; font-size: 22px; color: var(--ivory); line-height: 1.25; margin-bottom: 10px; }
+.evv-sub { font-size: 12px; font-weight: 300; color: rgba(250,247,242,0.7); line-height: 1.65; }
+.evv-sec { font-size: 9px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--divider); }
+.evv-pain { background: white; border: 1px solid var(--divider); border-radius: 6px; padding: 14px; margin-bottom: 8px; display: flex; gap: 12px; }
+.evv-pain-icon { font-size: 20px; flex-shrink: 0; }
+.evv-pain-title { font-family: 'Bodoni Moda', serif; font-size: 15px; color: var(--forest); margin-bottom: 3px; }
+.evv-pain-desc { font-size: 11px; font-weight: 300; color: var(--stone); line-height: 1.6; }
+.evv-roi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+.evv-roi-cell { background: var(--parchment); border-radius: 6px; padding: 14px; text-align: center; }
+.evv-roi-num { font-family: 'Bodoni Moda', serif; font-size: 26px; color: var(--forest); line-height: 1; }
+.evv-roi-label { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--stone); margin-top: 5px; line-height: 1.4; }
+.evv-feat-row { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--divider); font-size: 12px; color: var(--ink); align-items: flex-start; }
+.evv-feat-row:last-child { border-bottom: none; }
+.evv-check { color: var(--champagne); font-weight: 700; flex-shrink: 0; }
+.evv-cta { background: var(--forest); border-radius: 8px; padding: 22px 20px; margin-top: 20px; text-align: center; }
+.evv-cta-headline { font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 22px; color: var(--ivory); margin-bottom: 6px; }
+.evv-cta-sub { font-size: 12px; font-weight: 300; color: rgba(250,247,242,0.6); margin-bottom: 16px; line-height: 1.55; }
+.evv-cta-btn { display: inline-block; background: var(--champagne); color: var(--warm-black); font-weight: 700; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; padding: 12px 24px; border-radius: 4px; text-decoration: none; border: none; cursor: pointer; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--forest); color: var(--champagne); font-size: 13px; font-weight: 500;
+  font-style: italic; font-family: 'Bodoni Moda', serif; padding: 10px 22px;
+  border-radius: 4px; z-index: 999; transition: transform 0.25s; white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header class="ev-header">
+  <div>
+    <div class="ev-venue-name">Thistle & Vine</div>
+    <div class="ev-venue-sub">Estate Events & Catering</div>
+  </div>
+  <div class="ev-days-badge">
+    <div class="ev-days-num">47</div>
+    <div class="ev-days-label">Days Away</div>
+  </div>
+</header>
+
+<div class="event-hero">
+  <div class="eh-eyebrow">Your Event</div>
+  <div class="eh-event-name">The Wedding of<br>Elena & Marcus</div>
+  <div class="eh-couple">Harrington &amp; Okafor</div>
+  <div class="eh-detail-row">
+    <div class="eh-detail">📅 Saturday, August 9, 2026</div>
+    <div class="eh-detail">🕔 4:30 PM Ceremony</div>
+    <div class="eh-detail">👥 142 Guests</div>
+  </div>
+</div>
+
+<div class="budget-strip">
+  <div class="bs-item">
+    <div class="bs-val">$42,800</div>
+    <div class="bs-label">Budget</div>
+  </div>
+  <div class="bs-item">
+    <div class="bs-val">$36,420</div>
+    <div class="bs-label">Confirmed</div>
+  </div>
+  <div class="bs-item">
+    <div class="bs-val warn">$6,380</div>
+    <div class="bs-label">Remaining</div>
+  </div>
+  <div class="bs-item">
+    <div class="bs-val">7</div>
+    <div class="bs-label">Vendors</div>
+  </div>
+</div>
+
+<nav class="ev-tabs">
+  <div class="ev-tab active" data-tab="timeline">Day Timeline</div>
+  <div class="ev-tab" data-tab="vendors">Vendors</div>
+  <div class="ev-tab" data-tab="checklist">Checklist</div>
+  <div class="ev-tab" data-tab="value" style="color:var(--champagne-light)">★ Why This App</div>
+</nav>
+
+<div class="ev-content">
+
+  <!-- TIMELINE -->
+  <div class="panel active" id="panel-timeline">
+    <div class="sec-label">August 9, 2026 — Event Schedule</div>
+
+    <div class="timeline-item">
+      <div class="tl-time-col"><div class="tl-time">10<span class="tl-ampm">AM</span></div></div>
+      <div class="tl-line-col"><div class="tl-dot done"></div><div class="tl-vert"></div></div>
+      <div class="tl-body">
+        <div class="tl-title">Venue Open — Vendor Load-In</div>
+        <div class="tl-desc">Florist, rental co., A/V team, catering setup. Coordinator on site from 9:45 AM.</div>
+        <span class="tl-vendor">All Vendors</span>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="tl-time-col"><div class="tl-time">12<span class="tl-ampm">PM</span></div></div>
+      <div class="tl-line-col"><div class="tl-dot done"></div><div class="tl-vert"></div></div>
+      <div class="tl-body">
+        <div class="tl-title">Bridal Party Arrival — Getting Ready Suite</div>
+        <div class="tl-desc">Champagne service begins. Hair & makeup team on site (pre-booked separately).</div>
+        <span class="tl-vendor">Coordinator</span>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="tl-time-col"><div class="tl-time">2<span class="tl-ampm">PM</span></div></div>
+      <div class="tl-line-col"><div class="tl-dot done"></div><div class="tl-vert"></div></div>
+      <div class="tl-body">
+        <div class="tl-title">Photography — First Look & Portraits</div>
+        <div class="tl-desc">Garden terrace. Preferred start: 2:00 PM sharp. Backup location: library hall if overcast.</div>
+        <span class="tl-vendor">Bloom & Frame Studio</span>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="tl-time-col"><div class="tl-time">3:30<span class="tl-ampm">PM</span></div></div>
+      <div class="tl-line-col"><div class="tl-dot done"></div><div class="tl-vert"></div></div>
+      <div class="tl-body">
+        <div class="tl-title">Guest Arrival — Cocktail Hour Begins</div>
+        <div class="tl-desc">East lawn bar opens. Passed hors d'oeuvres (8 pieces): burrata crostini, smoked salmon blini, wagyu skewer, mushroom arancini.</div>
+        <span class="tl-vendor">Thistle Kitchen</span>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="tl-time-col"><div class="tl-time">4:30<span class="tl-ampm">PM</span></div></div>
+      <div class="tl-line-col"><div class="tl-dot now"></div><div class="tl-vert"></div></div>
+      <div class="tl-body">
+        <div class="tl-title now">★ Ceremony Begins</div>
+        <div class="tl-desc">Vineyard lawn, 142 seats. String quartet begins processional. 25–30 min ceremony. Officiant: Rev. Amara Osei.</div>
+        <span class="tl-vendor">Quartet + Officiant</span>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="tl-time-col"><div class="tl-time">5:15<span class="tl-ampm">PM</span></div></div>
+      <div class="tl-line-col"><div class="tl-dot future" style="border-color:var(--divider)"></div><div class="tl-vert"></div></div>
+      <div class="tl-body">
+        <div class="tl-title" style="color:var(--stone)">Cocktail Hour — Grand Ballroom Flip</div>
+        <div class="tl-desc">Guests move to terrace bar. Staff flips vineyard lawn to reception setup. 45 min window.</div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="tl-time-col"><div class="tl-time">6:00<span class="tl-ampm">PM</span></div></div>
+      <div class="tl-line-col"><div class="tl-dot future" style="border-color:var(--divider)"></div><div class="tl-vert"></div></div>
+      <div class="tl-body">
+        <div class="tl-title" style="color:var(--stone)">Reception Doors Open — Seated Dinner</div>
+        <div class="tl-desc">Plated 3-course: beet salad / choice of filet or sea bass / vanilla panna cotta. Wine service throughout.</div>
+        <span class="tl-vendor">Thistle Kitchen</span>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="tl-time-col"><div class="tl-time">7:30<span class="tl-ampm">PM</span></div></div>
+      <div class="tl-line-col"><div class="tl-dot future" style="border-color:var(--divider)"></div><div class="tl-vert"></div></div>
+      <div class="tl-body">
+        <div class="tl-title" style="color:var(--stone)">Toasts · First Dance · Cake Cutting</div>
+        <div class="tl-desc">4 toasts (max 3 min each). DJ transitions from dinner set. 5-tier almond cake with raspberry.</div>
+        <span class="tl-vendor">DJ Westbrook</span>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="tl-time-col"><div class="tl-time">8:00<span class="tl-ampm">PM</span></div></div>
+      <div class="tl-line-col"><div class="tl-dot future" style="border-color:var(--divider)"></div><div class="tl-vert"></div></div>
+      <div class="tl-body">
+        <div class="tl-title" style="color:var(--stone)">Open Dancing</div>
+        <div class="tl-desc">DJ Westbrook full set. Late-night bites at 9:30 PM: mini sliders, truffle fries, churro bites.</div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="tl-time-col"><div class="tl-time">11<span class="tl-ampm">PM</span></div></div>
+      <div class="tl-line-col"><div class="tl-dot future" style="border-color:var(--divider)"></div></div>
+      <div class="tl-body" style="padding-bottom:0">
+        <div class="tl-title" style="color:var(--stone)">Send-Off & Venue Close</div>
+        <div class="tl-desc">Sparkler exit. All vendors out by midnight. Rental pickup scheduled 8 AM Sunday.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VENDORS -->
+  <div class="panel" id="panel-vendors">
+    <div class="sec-label">Confirmed Vendors</div>
+
+    <div class="vendor-card">
+      <div class="vc-avatar">🌸</div>
+      <div class="vc-info">
+        <div class="vc-role">Florals</div>
+        <div class="vc-name">Petal & Bough Studio</div>
+        <div class="vc-detail">Arrive 10:00 AM · Lead: Camille Ross</div>
+        <span class="vc-status confirmed">Confirmed</span>
+      </div>
+      <div class="vc-action"><button class="vc-btn" onclick="showToast('Calling Camille…')">Call</button></div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vc-avatar">📸</div>
+      <div class="vc-info">
+        <div class="vc-role">Photography</div>
+        <div class="vc-name">Bloom & Frame Studio</div>
+        <div class="vc-detail">Arrive 1:30 PM · Lead: James Thorne</div>
+        <span class="vc-status confirmed">Confirmed</span>
+      </div>
+      <div class="vc-action"><button class="vc-btn" onclick="showToast('Calling James…')">Call</button></div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vc-avatar">🎵</div>
+      <div class="vc-info">
+        <div class="vc-role">DJ / Music</div>
+        <div class="vc-name">DJ Westbrook</div>
+        <div class="vc-detail">Arrive 4:00 PM setup · Marcus Webb</div>
+        <span class="vc-status confirmed">Confirmed</span>
+      </div>
+      <div class="vc-action"><button class="vc-btn" onclick="showToast('Calling Marcus…')">Call</button></div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vc-avatar">🎻</div>
+      <div class="vc-info">
+        <div class="vc-role">Ceremony Music</div>
+        <div class="vc-name">Ashford String Quartet</div>
+        <div class="vc-detail">Arrive 3:45 PM · 90 min set</div>
+        <span class="vc-status confirmed">Confirmed</span>
+      </div>
+      <div class="vc-action"><button class="vc-btn" onclick="showToast('Calling quartet…')">Call</button></div>
+    </div>
+
+    <div class="vendor-card">
+      <div class="vc-avatar">🎂</div>
+      <div class="vc-info">
+        <div class="vc-role">Wedding Cake</div>
+        <div class="vc-name">Sugar & Stems Bakery</div>
+        <div class="vc-detail">Delivery 1:00 PM · 5-tier almond raspberry</div>
+        <span class="vc-status pending">Final Count Pending</span>
+      </div>
+      <div class="vc-action"><button class="vc-btn" onclick="showToast('Messaging bakery…')">Message</button></div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="panel" id="panel-checklist">
+    <div class="check-group">
+      <div class="check-group-title">Catering & Menu</div>
+      <div class="check-item done" onclick="toggleCheck(this)">
+        <div class="ci-box">✓</div>
+        <div class="ci-text">Final menu confirmed with kitchen</div>
+        <div class="ci-due">Done</div>
+      </div>
+      <div class="check-item done" onclick="toggleCheck(this)">
+        <div class="ci-box">✓</div>
+        <div class="ci-text">Dietary restrictions submitted (11 guests: 4 GF, 3 vegan, 2 nut allergy, 2 kosher)</div>
+        <div class="ci-due">Done</div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="ci-box"></div>
+        <div class="ci-text">Final guest count confirmed to kitchen</div>
+        <div class="ci-due overdue">Due Jun 28</div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="ci-box"></div>
+        <div class="ci-text">Late-night snack quantities finalized</div>
+        <div class="ci-due">Jul 15</div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group-title">Logistics & Coordination</div>
+      <div class="check-item done" onclick="toggleCheck(this)">
+        <div class="ci-box">✓</div>
+        <div class="ci-text">Venue walk-through completed</div>
+        <div class="ci-due">Done</div>
+      </div>
+      <div class="check-item done" onclick="toggleCheck(this)">
+        <div class="ci-box">✓</div>
+        <div class="ci-text">Vendor call sheets distributed</div>
+        <div class="ci-due">Done</div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="ci-box"></div>
+        <div class="ci-text">Seating chart finalized (table map to coordinator)</div>
+        <div class="ci-due overdue">Due Jun 30</div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="ci-box"></div>
+        <div class="ci-text">Rehearsal dinner confirmed (Aug 8, 6 PM)</div>
+        <div class="ci-due">Jul 20</div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="ci-box"></div>
+        <div class="ci-text">Sparkler exit plan reviewed with fire marshal</div>
+        <div class="ci-due">Aug 1</div>
+      </div>
+    </div>
+
+    <div class="check-group">
+      <div class="check-group-title">Payments</div>
+      <div class="check-item done" onclick="toggleCheck(this)">
+        <div class="ci-box">✓</div>
+        <div class="ci-text">Venue deposit paid (50%)</div>
+        <div class="ci-due">Done</div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="ci-box"></div>
+        <div class="ci-text">Venue final balance — $14,200</div>
+        <div class="ci-due overdue">Due Jul 10</div>
+      </div>
+      <div class="check-item" onclick="toggleCheck(this)">
+        <div class="ci-box"></div>
+        <div class="ci-text">Photographer final payment</div>
+        <div class="ci-due">Jul 25</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUE -->
+  <div class="panel no-pad" id="panel-value">
+    <div class="ev-value">
+      <div class="evv-hero">
+        <div class="evv-eyebrow">Built for Event Venues & Catering</div>
+        <div class="evv-headline">Give clients a single place to live inside their event — and stop managing everything through email threads and spreadsheets.</div>
+        <div class="evv-sub">Thistle & Vine gives each client a dedicated event portal with their live timeline, vendor contacts, budget tracker, and action checklist — all in one app delivered the day they book. You look organized. They feel taken care of.</div>
+      </div>
+
+      <div class="evv-sec">Pain Points This Eliminates</div>
+
+      <div class="evv-pain">
+        <div class="evv-pain-icon">📧</div>
+        <div>
+          <div class="evv-pain-title">Event coordination living in 200 email threads</div>
+          <div class="evv-pain-desc">Couples and corporate clients forward the same documents to different vendors, lose confirmation emails, and end up texting the coordinator at 11 PM to find something. This portal centralizes the vendor list, timeline, and checklist in one place — accessible offline at any time, even on the day itself when WiFi fails.</div>
+        </div>
+      </div>
+      <div class="evv-pain">
+        <div class="evv-pain-icon">😰</div>
+        <div>
+          <div class="evv-pain-title">Clients who don't know what's still outstanding — until it's too late</div>
+          <div class="evv-pain-desc">A final guest count missed by three days. A seating chart overdue by a week. Payment due dates forgotten. The checklist with color-coded deadlines and overdue flags surfaces exactly what needs to happen next — without the coordinator having to chase every item manually.</div>
+        </div>
+      </div>
+      <div class="evv-pain">
+        <div class="evv-pain-icon">📋</div>
+        <div>
+          <div class="evv-pain-title">Vendor no-contact the morning of the event</div>
+          <div class="evv-pain-desc">When the florist is late and nobody has the direct number handy, precious setup time disappears. Every vendor card in this app has a direct call button and arrival time — so the client or day-of coordinator can reach anyone in under 10 seconds, even without cell service using cached contacts.</div>
+        </div>
+      </div>
+      <div class="evv-pain">
+        <div class="evv-pain-icon">💰</div>
+        <div>
+          <div class="evv-pain-title">Budget surprises in the final weeks</div>
+          <div class="evv-pain-desc">Couples often don't know how close they are to their ceiling until they're over it. The live budget tracker showing confirmed spend vs. remaining balance creates accountability at every decision point — so upsells happen earlier (when there's budget) and surprises are rare.</div>
+        </div>
+      </div>
+      <div class="evv-pain">
+        <div class="evv-pain-icon">⏱️</div>
+        <div>
+          <div class="evv-pain-title">Day-of timeline living in a PDF nobody can find</div>
+          <div class="evv-pain-desc">A printed timeline gets lost, coffee-stained, or simply not distributed to everyone who needs it. The live event timeline in this app is on every vendor's phone, updated in real time, and available offline. When the photographer needs to know what's happening at 5:15 PM, they check the app — not the coordinator.</div>
+        </div>
+      </div>
+      <div class="evv-pain" style="margin-bottom:20px">
+        <div class="evv-pain-icon">🔁</div>
+        <div>
+          <div class="evv-pain-title">No mechanism to get referrals or re-bookings after the event</div>
+          <div class="evv-pain-desc">After the event, the relationship ends because there's no touchpoint. A branded app that couples keep on their phone — with photos, the timeline, and a beautiful record of their day — becomes the most organic referral tool you can have. When their friends ask "who did your wedding?" they open the app and share the link.</div>
+        </div>
+      </div>
+
+      <div class="evv-sec">The Numbers</div>
+      <div class="evv-roi-grid">
+        <div class="evv-roi-cell">
+          <div class="evv-roi-num">80%</div>
+          <div class="evv-roi-label">Fewer "where is X?" coordinator calls day-of</div>
+        </div>
+        <div class="evv-roi-cell">
+          <div class="evv-roi-num">3×</div>
+          <div class="evv-roi-label">Faster checklist completion vs. email follow-up</div>
+        </div>
+        <div class="evv-roi-cell">
+          <div class="evv-roi-num">100%</div>
+          <div class="evv-roi-label">Vendors have direct contact & arrival time in-app</div>
+        </div>
+        <div class="evv-roi-cell">
+          <div class="evv-roi-num">1 link</div>
+          <div class="evv-roi-label">Sent at booking — client onboarded in minutes</div>
+        </div>
+      </div>
+
+      <div class="evv-sec">What's Included</div>
+      <div style="background:white;border:1px solid var(--divider);border-radius:6px;padding:4px 14px;margin-bottom:20px">
+        <div class="evv-feat-row"><span class="evv-check">✓</span>Live day-of timeline with vendor assignments and notes</div>
+        <div class="evv-feat-row"><span class="evv-check">✓</span>Vendor directory with direct call, arrival times, and status</div>
+        <div class="evv-feat-row"><span class="evv-check">✓</span>Action checklist with due dates and overdue flags</div>
+        <div class="evv-feat-row"><span class="evv-check">✓</span>Budget tracker — confirmed spend vs. remaining balance</div>
+        <div class="evv-feat-row"><span class="evv-check">✓</span>Event countdown on every screen</div>
+        <div class="evv-feat-row"><span class="evv-check">✓</span>Works offline — no WiFi needed day-of</div>
+        <div class="evv-feat-row"><span class="evv-check">✓</span>Branded to your venue — name, palette, and style</div>
+        <div class="evv-feat-row"><span class="evv-check">✓</span>Client keeps the app after the event — built-in referral tool</div>
+      </div>
+
+      <div class="evv-cta">
+        <div class="evv-cta-headline">Ready to give your clients this?</div>
+        <div class="evv-cta-sub">We'll build a live portal for your venue in 24 hours — branded, with a real event loaded in.</div>
+        <a class="evv-cta-btn" href="mailto:you@youremail.com?subject=Event Venue Portal Demo">Request Your Demo</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  document.querySelectorAll('.ev-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.ev-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  function toggleCheck(el) {
+    el.classList.toggle('done');
+    const box = el.querySelector('.ci-box');
+    box.textContent = el.classList.contains('done') ? '✓' : '';
+    showToast(el.classList.contains('done') ? 'Marked complete' : 'Unmarked');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+<style>.kw-watermark{position:fixed;bottom:12px;right:12px;z-index:99999;background:rgba(0,0,0,0.55);color:rgba(255,255,255,0.85);font-family:monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:5px 10px;border-radius:3px;pointer-events:none;backdrop-filter:blur(4px)}</style><div class="kw-watermark">Demo · klok-ventures.com</div></body>
+</html>

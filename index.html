@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="klokventures-favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Klok Ventures — Business Efficiency & Technology Consulting</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@300;400;500;700&family=Sora:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0E0E10;
+  --dark: #16161A;
+  --panel: #1E1E24;
+  --blue: #2D6BE4;
+  --blue-dim: #1A4BA8;
+  --silver: #C8CAD0;
+  --white: #F2F0EC;
+  --muted: #6A6A76;
+  --divider: rgba(200,202,208,0.1);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Sora', sans-serif; background: var(--black); color: var(--white); line-height: 1.6; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 56px;
+  background: rgba(14,14,16,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--divider);
+}
+.nav-logo {
+  font-family: 'Azeret Mono', monospace; font-size: 16px; font-weight: 700;
+  color: var(--white); letter-spacing: 0.04em;
+}
+.nav-logo span { color: var(--blue); }
+.nav-clock {
+  font-family: 'Azeret Mono', monospace; font-size: 13px; color: var(--muted);
+  letter-spacing: 0.1em;
+}
+.nav-cta {
+  font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue);
+  border: 1px solid var(--blue); padding: 7px 14px; text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.nav-cta:hover { background: var(--blue); color: white; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: flex-end; padding: 56px 24px 48px;
+  position: relative; overflow: hidden;
+}
+.hero-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(var(--divider) 1px, transparent 1px),
+    linear-gradient(90deg, var(--divider) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.3) 70%, transparent 100%);
+}
+.hero-eyebrow {
+  font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--blue);
+  margin-bottom: 20px;
+}
+.hero-headline {
+  font-size: clamp(36px, 8vw, 72px); font-weight: 700; line-height: 1.05;
+  letter-spacing: -0.03em; color: var(--white); margin-bottom: 24px;
+  max-width: 900px;
+}
+.hero-headline em { font-style: normal; color: var(--blue); }
+.hero-sub {
+  font-size: 16px; font-weight: 300; color: var(--silver); max-width: 520px;
+  line-height: 1.7; margin-bottom: 36px;
+}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.btn-primary {
+  font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; background: var(--blue);
+  color: white; border: none; padding: 14px 28px; text-decoration: none;
+  cursor: pointer; transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--blue-dim); }
+.btn-ghost {
+  font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase; background: transparent;
+  color: var(--silver); border: 1px solid var(--divider); padding: 14px 28px;
+  text-decoration: none; cursor: pointer; transition: border-color 0.15s, color 0.15s;
+}
+.btn-ghost:hover { border-color: var(--silver); color: var(--white); }
+.hero-stat-row {
+  display: flex; gap: 32px; margin-top: 56px; padding-top: 32px;
+  border-top: 1px solid var(--divider); flex-wrap: wrap;
+}
+.hero-stat-num {
+  font-family: 'Azeret Mono', monospace; font-size: 28px; font-weight: 700;
+  color: var(--white); line-height: 1;
+}
+.hero-stat-label {
+  font-size: 11px; font-weight: 400; color: var(--muted); margin-top: 4px;
+  letter-spacing: 0.04em;
+}
+
+/* ── SECTIONS ── */
+section { padding: 80px 24px; max-width: 1000px; margin: 0 auto; }
+.section-full { padding: 80px 24px; background: var(--dark); }
+.section-full-inner { max-width: 1000px; margin: 0 auto; }
+
+.sec-eyebrow {
+  font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 500;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--blue);
+  margin-bottom: 16px;
+}
+.sec-headline {
+  font-size: clamp(24px, 4vw, 38px); font-weight: 700; letter-spacing: -0.02em;
+  line-height: 1.15; color: var(--white); margin-bottom: 16px;
+}
+.sec-sub {
+  font-size: 15px; font-weight: 300; color: var(--silver); max-width: 540px;
+  line-height: 1.7; margin-bottom: 40px;
+}
+
+/* ── HOW IT WORKS ── */
+.process-steps { display: flex; flex-direction: column; gap: 0; }
+.process-step {
+  display: grid; grid-template-columns: 64px 1fr; gap: 0;
+  padding: 24px 0; border-bottom: 1px solid var(--divider);
+}
+.process-step:last-child { border-bottom: none; }
+.step-num {
+  font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 700;
+  color: var(--blue); letter-spacing: 0.1em; padding-top: 3px;
+}
+.step-content {}
+.step-title { font-size: 17px; font-weight: 600; color: var(--white); margin-bottom: 6px; }
+.step-desc { font-size: 13px; font-weight: 300; color: var(--silver); line-height: 1.65; }
+
+/* ── INDUSTRIES ── */
+.industry-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1px; background: var(--divider); border: 1px solid var(--divider);
+}
+.industry-cell {
+  background: var(--dark); padding: 20px;
+  transition: background 0.15s;
+}
+.industry-cell:hover { background: var(--panel); }
+.industry-icon { font-size: 22px; margin-bottom: 8px; }
+.industry-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+.industry-desc { font-size: 11px; font-weight: 300; color: var(--muted); line-height: 1.5; }
+
+/* ── DEMOS ── */
+.demo-strip {
+  display: flex; gap: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px; margin: 0 -24px; padding-left: 24px; padding-right: 24px;
+}
+.demo-card {
+  flex-shrink: 0; width: 200px; background: var(--panel);
+  border: 1px solid var(--divider); padding: 18px;
+  transition: border-color 0.15s, transform 0.15s;
+  text-decoration: none;
+}
+.demo-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+.demo-card-icon { font-size: 24px; margin-bottom: 10px; }
+.demo-card-industry {
+  font-family: 'Azeret Mono', monospace; font-size: 9px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--blue); margin-bottom: 5px;
+}
+.demo-card-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+.demo-card-desc { font-size: 11px; font-weight: 300; color: var(--muted); line-height: 1.5; }
+
+/* ── WHY PWA ── */
+.why-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+  background: var(--divider); border: 1px solid var(--divider);
+}
+.why-cell { background: var(--black); padding: 24px; }
+.why-cell-title { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.why-cell-desc { font-size: 12px; font-weight: 300; color: var(--silver); line-height: 1.65; }
+
+/* ── ABOUT ── */
+.about-block {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start;
+}
+.about-quote {
+  font-size: clamp(18px, 3vw, 26px); font-weight: 300; line-height: 1.5;
+  color: var(--white); border-left: 3px solid var(--blue); padding-left: 20px;
+  font-style: italic;
+}
+.about-body { font-size: 14px; font-weight: 300; color: var(--silver); line-height: 1.8; }
+.about-body strong { color: var(--white); font-weight: 600; }
+.about-name {
+  font-family: 'Azeret Mono', monospace; font-size: 12px; font-weight: 700;
+  color: var(--blue); letter-spacing: 0.1em; margin-top: 20px;
+}
+
+/* ── CTA ── */
+.cta-section {
+  padding: 80px 24px; text-align: center;
+  border-top: 1px solid var(--divider);
+}
+.cta-headline {
+  font-size: clamp(28px, 5vw, 48px); font-weight: 700; letter-spacing: -0.02em;
+  color: var(--white); margin-bottom: 16px; line-height: 1.1;
+}
+.cta-sub { font-size: 15px; font-weight: 300; color: var(--silver); margin-bottom: 32px; }
+.cta-email {
+  font-family: 'Azeret Mono', monospace; font-size: 13px; color: var(--blue);
+  text-decoration: none; border-bottom: 1px solid var(--blue); padding-bottom: 2px;
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--dark); border-top: 1px solid var(--divider);
+  padding: 24px; display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.footer-logo {
+  font-family: 'Azeret Mono', monospace; font-size: 14px; font-weight: 700;
+  color: var(--muted);
+}
+.footer-logo span { color: var(--blue); }
+.footer-copy { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .about-block { grid-template-columns: 1fr; }
+  .why-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .hero-stat-row { gap: 20px; }
+  .hiw-3col { grid-template-columns: 1fr !important; }
+  .hiw-pricing { grid-template-columns: 1fr !important; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo"><img src="klokventures-logo.png" alt="Klok Ventures" style="height:32px;width:32px;object-fit:contain;flex-shrink:0"> Klok<span>Ventures</span></div>
+  <div class="nav-clock" id="nav-clock">00:00:00</div>
+  <a class="nav-cta" href="mailto:cklok5174@gmail.com">Get in Touch</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-eyebrow">Connor Klok · Business Efficiency & Technology</div>
+  <h1 class="hero-headline">
+    I help you cut the busywork,<br>
+    <em>find what's slowing you down,</em><br>
+    and grow with confidence.
+  </h1>
+  <p class="hero-sub">
+    Every business has something that's clunky, repetitive, or held together with spreadsheets and sticky notes. I figure out what that is — and build the right fix for it, whether that's automating a process, cleaning up how your team works, or building you a custom tool. No jargon, no one-size-fits-all pitch.
+  </p>
+  <div class="hero-actions">
+    <a class="btn-primary" href="klokventures-intake.html">Tell Me What's Slowing You Down</a>
+    <a class="btn-ghost" href="#demos">See Examples of My Work</a>
+  </div>
+  <div class="hero-stat-row">
+    <div>
+      <div class="hero-stat-num">Any</div>
+      <div class="hero-stat-label">Industry — if it's a real problem, I'll figure it out</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">Fast</div>
+      <div class="hero-stat-label">From conversation to working solution</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">$0</div>
+      <div class="hero-stat-label">To see a working demo before you commit</div>
+    </div>
+    <div>
+      <div class="hero-stat-num">1</div>
+      <div class="hero-stat-label">Person you talk to, start to finish</div>
+    </div>
+  </div>
+</div>
+
+<!-- WHAT I HELP WITH -->
+<section>
+  <div class="sec-eyebrow">What I Help With</div>
+  <h2 class="sec-headline">If it feels harder than it should be, that's where I start.</h2>
+  <p class="sec-sub">I don't lead with a specific tool or technology. I start with the problem and build whatever actually solves it.</p>
+
+  <div class="industry-grid">
+    <div class="industry-cell">
+      <div class="industry-icon">🔁</div>
+      <div class="industry-name">Automate the boring stuff</div>
+      <div class="industry-desc">Manual scheduling, repetitive data entry, timecards retyped into payroll — if your team does the same tedious task every week, it can probably be automated.</div>
+    </div>
+    <div class="industry-cell">
+      <div class="industry-icon">🔍</div>
+      <div class="industry-name">Bring clarity to messy processes</div>
+      <div class="industry-desc">When nobody's quite sure who's responsible for what, or where things stand, a clearer system — not necessarily new software — often fixes it.</div>
+    </div>
+    <div class="industry-cell">
+      <div class="industry-icon">📱</div>
+      <div class="industry-name">Build a custom tool or app</div>
+      <div class="industry-desc">Sometimes the right answer is software built specifically for how you work — accessible from any phone, no app store required.</div>
+    </div>
+    <div class="industry-cell">
+      <div class="industry-icon">📈</div>
+      <div class="industry-name">Spot growth you're not seeing</div>
+      <div class="industry-desc">An outside look at your operation often surfaces opportunities — efficiency gains, untapped capacity, places you're leaving money on the table.</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- HOW IT WORKS -->
+<div class="section-full">
+  <div class="section-full-inner">
+    <div class="sec-eyebrow">How It Works</div>
+    <h2 class="sec-headline">From conversation to a real fix — fast.</h2>
+    <p class="sec-sub">No lengthy discovery phases. No assumptions about what you need before I understand your business.</p>
+
+    <div class="process-steps">
+      <div class="process-step">
+        <div class="step-num">01 —</div>
+        <div class="step-content">
+          <div class="step-title">Brief call — 30 minutes</div>
+          <div class="step-desc">We talk about your business and what's costing you the most time, money, or sanity. I ask the questions. You bring the domain knowledge. No pressure to know what the "solution" should look like — that's my job.</div>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-num">02 —</div>
+        <div class="step-content">
+          <div class="step-title">I figure out the right fix</div>
+          <div class="step-desc">Sometimes that's a custom app. Sometimes it's a smarter spreadsheet, an automated process, or just a clearer way of doing things. I'll tell you honestly what I think will actually work — not just what I'm used to building.</div>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-num">03 —</div>
+        <div class="step-content">
+          <div class="step-title">You see it before you commit</div>
+          <div class="step-desc">A working demo, a sample tool, or a clear written plan — whatever fits the project. You see real, tangible progress before any major commitment, and we refine from there.</div>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-num">04 —</div>
+        <div class="step-content">
+          <div class="step-title">Delivered and supported</div>
+          <div class="step-desc">You get something that works, that your team can actually use, and that you fully own. I stick around for support if you want it — but you're never locked in.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INDUSTRIES -->
+<div class="section-full">
+  <div class="section-full-inner">
+    <div class="sec-eyebrow">Industries I Know Well</div>
+    <h2 class="sec-headline">A few examples of problems I've solved.</h2>
+    <p class="sec-sub" style="margin-bottom:32px">These are real examples from a handful of industries — but the same thinking applies wherever you do business. If you don't see your industry below, that doesn't mean I can't help.</p>
+
+    <div class="industry-grid">
+      <div class="industry-cell">
+        <div class="industry-icon">🏗️</div>
+        <div class="industry-name">Construction & Trades</div>
+        <div class="industry-desc">Punch lists, safety logs, change orders, crew check-in — all offline-capable on the job site.</div>
+      </div>
+      <div class="industry-cell">
+        <div class="industry-icon">🏠</div>
+        <div class="industry-name">Real Estate</div>
+        <div class="industry-desc">Property tour apps with disclosures, buyer notes, lead capture, and comparable listings.</div>
+      </div>
+      <div class="industry-cell">
+        <div class="industry-icon">🍽️</div>
+        <div class="industry-name">Restaurant & Hospitality</div>
+        <div class="industry-desc">Digital menus with allergen info, table-side ordering, loyalty programs — zero commission.</div>
+      </div>
+      <div class="industry-cell">
+        <div class="industry-icon">💉</div>
+        <div class="industry-name">Med Spa & Wellness</div>
+        <div class="industry-desc">Client portals with booking, visit history, treatment journeys, and loyalty rewards.</div>
+      </div>
+      <div class="industry-cell">
+        <div class="industry-icon">🚙</div>
+        <div class="industry-name">Auto Dealership & Service</div>
+        <div class="industry-desc">Live service pipeline, digital RO approval, service history, and advisor messaging.</div>
+      </div>
+      <div class="industry-cell">
+        <div class="industry-icon">🌿</div>
+        <div class="industry-name">Event Venues & Catering</div>
+        <div class="industry-desc">Day-of timelines, vendor directories, budgets, and checklists — for the client and coordinator.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DEMOS -->
+<section id="demos">
+  <div class="sec-eyebrow">Examples of My Work</div>
+  <h2 class="sec-headline">Here's what "the right fix" can look like.</h2>
+  <p class="sec-sub">These are working app demos — one type of solution I build. Tap through them on your phone. If what you need looks different from this, that's normal — tell me the problem and we'll figure out the right shape for it together.</p>
+
+  <div class="demo-strip">
+    <a class="demo-card" href="construction-pwa-demo.html">
+      <div class="demo-card-icon">🏗️</div>
+      <div class="demo-card-industry">Construction</div>
+      <div class="demo-card-name">BuildLog</div>
+      <div class="demo-card-desc">Field ops: punch list, daily log, safety, change orders</div>
+    </a>
+    <a class="demo-card" href="realestate-pwa-demo.html">
+      <div class="demo-card-icon">🏠</div>
+      <div class="demo-card-industry">Real Estate</div>
+      <div class="demo-card-name">OpenDoor</div>
+      <div class="demo-card-desc">Property tour with buyer notes and lead capture</div>
+    </a>
+    <a class="demo-card" href="restaurant-pwa-demo.html">
+      <div class="demo-card-icon">🍽️</div>
+      <div class="demo-card-industry">Restaurant</div>
+      <div class="demo-card-name">Mezzanine</div>
+      <div class="demo-card-desc">Table-side menu, ordering, and loyalty</div>
+    </a>
+    <a class="demo-card" href="medspa-pwa-demo.html">
+      <div class="demo-card-icon">💉</div>
+      <div class="demo-card-industry">Med Spa</div>
+      <div class="demo-card-name">Lumière</div>
+      <div class="demo-card-desc">Client portal with visits, journey, and rewards</div>
+    </a>
+    <a class="demo-card" href="auto-service-pwa-demo.html">
+      <div class="demo-card-icon">🚙</div>
+      <div class="demo-card-industry">Auto Service</div>
+      <div class="demo-card-name">AutoTrack</div>
+      <div class="demo-card-desc">Live RO status, digital approval, and advisor chat</div>
+    </a>
+    <a class="demo-card" href="event-venue-pwa-demo.html">
+      <div class="demo-card-icon">🌿</div>
+      <div class="demo-card-industry">Event Venue</div>
+      <div class="demo-card-name">Thistle & Vine</div>
+      <div class="demo-card-desc">Event timeline, vendors, checklist, and budget</div>
+    </a>
+  </div>
+</section>
+
+<!-- WHY PWA -->
+<div class="section-full">
+  <div class="section-full-inner">
+    <div class="sec-eyebrow">When An App Is The Right Call</div>
+    <h2 class="sec-headline">If the fix turns out to be an app, here's why I build it this way.</h2>
+    <p class="sec-sub" style="margin-bottom:32px">When a custom app genuinely is the best solution, I build what's called a Progressive Web App — it gives your customers an app-quality experience without the friction, cost, or gatekeeping of the app stores.</p>
+
+    <div class="why-grid">
+      <div class="why-cell">
+        <div class="why-cell-title"><span>📵</span> Works Offline</div>
+        <div class="why-cell-desc">Built for real-world conditions — job sites with no signal, basements, rural properties. Everything loads from cache and syncs when connectivity returns.</div>
+      </div>
+      <div class="why-cell">
+        <div class="why-cell-title"><span>🔗</span> Installs from a Link</div>
+        <div class="why-cell-desc">Send a URL by text or email. Your customer opens it in their browser and adds it to their home screen in two taps. No App Store. No Play Store. No review process.</div>
+      </div>
+      <div class="why-cell">
+        <div class="why-cell-title"><span>💰</span> No Platform Tax</div>
+        <div class="why-cell-desc">Apple and Google take 15–30% of in-app purchases and charge $99/year just to exist. A PWA cuts them out entirely — you keep everything your customers pay.</div>
+      </div>
+      <div class="why-cell">
+        <div class="why-cell-title"><span>⚡</span> Fast to Build & Change</div>
+        <div class="why-cell-desc">Native apps take months and cost tens of thousands. A PWA goes from brief to working product remarkably fast — and updates deploy instantly, no app store review required.</div>
+      </div>
+      <div class="why-cell">
+        <div class="why-cell-title"><span>📱</span> Any Device, Any Screen</div>
+        <div class="why-cell-desc">One build works on iPhone, Android, tablet, and desktop. Your field crew uses it on Android. Your clients use it on iPhone. Same app, same experience.</div>
+      </div>
+      <div class="why-cell">
+        <div class="why-cell-title"><span>🎨</span> Fully Branded</div>
+        <div class="why-cell-desc">Every pixel is yours. Your name, your colors, your voice. Not a white-labeled SaaS tool with someone else's logo in the corner — a product that looks like you built it.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section>
+  <div class="sec-eyebrow">About</div>
+  <div class="about-block">
+    <div>
+      <blockquote class="about-quote">
+        "I've run the operation, not just observed it. That's the difference between software that looks right and software that actually fits how your business works."
+      </blockquote>
+      <div class="about-name">— Connor Klok, Founder</div>
+    </div>
+    <div class="about-body">
+      <p>I'm Connor — a digital product consultant based in Portage, Michigan who builds custom apps for small and mid-size businesses that deserve better software than what's available off the shelf.</p>
+      <br>
+      <p>Before consulting, I managed field operations across <strong>200+ active work zone sites</strong>, leading a 20-person crew while improving fleet delivery efficiency from <strong>36.8% to 47.4%</strong> and growing annual throughput <strong>42%</strong> — through better scheduling, not new software budgets. I know what it's like to run a business on a spreadsheet that's one tab away from falling apart.</p>
+      <br>
+      <p>I work with owners and operators directly — no account managers, no handoff to a junior developer, no six-week waiting period. <strong>You talk to me, I build it, you own it.</strong></p>
+      <br>
+      <p>I specialize in Progressive Web Apps because they hit a sweet spot that nothing else does: native-quality experience, web-speed delivery, and a cost structure that actually works for businesses that aren't Fortune 500 companies. For lighter operational fixes — scheduling, payroll, dispatch — I also offer <a href="klokventures-automation.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">process & automation consulting</a>.</p>
+      <br>
+      <p>If you have a workflow that's running on paper, group texts, or a spreadsheet someone built in 2018 — I can probably fix it fast.</p>
+      <br>
+      <p style="font-size:13px;color:var(--muted)">Connor Klok · Portage, MI · <a href="mailto:cklok5174@gmail.com" style="color:var(--blue);text-decoration:none">cklok5174@gmail.com</a> · <a href="https://www.linkedin.com/in/connor-klok" target="_blank" style="color:var(--blue);text-decoration:none">LinkedIn</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW I WORK -->
+<div class="section-full">
+  <div class="section-full-inner">
+    <div class="sec-eyebrow">How I Work</div>
+    <h2 class="sec-headline">Agency-quality output.<br>Without the agency overhead.</h2>
+    <p class="sec-sub" style="margin-bottom:40px">I'm going to be straight with you about something most consultants won't say out loud.</p>
+
+    <div style="background:var(--panel);border:1px solid var(--divider);border-left:3px solid var(--blue);padding:28px;margin-bottom:24px">
+      <div style="font-size:18px;font-weight:600;color:var(--white);line-height:1.4;margin-bottom:12px">I use AI as a core part of my development workflow — and that's why your project costs less and moves faster than it would anywhere else.</div>
+      <div style="font-size:14px;font-weight:300;color:var(--silver);line-height:1.75">What used to take a team of developers weeks to produce, I can deliver in a fraction of the time using modern AI-assisted tools — without sacrificing quality. I'm transparent about this because it directly benefits you: lower cost, faster turnaround, and a consultant who focuses his time on strategy, design decisions, and understanding your business rather than grinding through boilerplate code.</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--divider);border:1px solid var(--divider);margin-bottom:24px">
+      <div style="background:var(--dark);padding:22px 20px">
+        <div style="font-size:22px;margin-bottom:10px">🧠</div>
+        <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:6px">The expertise is still mine</div>
+        <div style="font-size:12px;font-weight:300;color:var(--silver);line-height:1.65">AI doesn't know your industry, your customers, or what your workflow actually needs. I do. The judgment, the questions I ask, the decisions I make — that's the service you're paying for.</div>
+      </div>
+      <div style="background:var(--dark);padding:22px 20px">
+        <div style="font-size:22px;margin-bottom:10px">⚡</div>
+        <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:6px">Speed becomes your advantage</div>
+        <div style="font-size:12px;font-weight:300;color:var(--silver);line-height:1.65">A traditional agency quotes 8–12 weeks. I can put a working demo in your hands fast. That speed isn't cutting corners — it's what happens when you combine the right tools with focused expertise.</div>
+      </div>
+      <div style="background:var(--dark);padding:22px 20px">
+        <div style="font-size:22px;margin-bottom:10px">💰</div>
+        <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:6px">Cost savings pass to you</div>
+        <div style="font-size:12px;font-weight:300;color:var(--silver);line-height:1.65">Agencies charge $150–$300/hr because they have 40 people on payroll. I have none of that overhead. AI tools let me work lean and pass the savings directly to you without a drop in quality.</div>
+      </div>
+    </div>
+
+    <div style="background:var(--dark);border:1px solid var(--divider);padding:20px 24px;display:flex;gap:16px;align-items:flex-start">
+      <div style="font-size:20px;flex-shrink:0">🔧</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:4px">Think of it like power tools vs. hand tools</div>
+        <div style="font-size:12px;font-weight:300;color:var(--silver);line-height:1.65">A skilled contractor using a nail gun builds faster than one using a hammer. The craftsmanship — the planning, the precision, the decisions about what goes where — is still entirely theirs. AI is my nail gun. Your project benefits from both the skill and the speed.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="section-full">
+  <div class="section-full-inner">
+    <div class="sec-eyebrow">Pricing</div>
+    <h2 class="sec-headline">Every project is quoted.<br>Here's what to expect.</h2>
+    <p class="sec-sub" style="margin-bottom:40px">No fixed packages. Every solution is scoped to what your business actually needs — nothing more, nothing less. We figure out the right fix before talking price.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--divider);border:1px solid var(--divider);margin-bottom:32px">
+      <div style="background:var(--dark);padding:32px 28px">
+        <div style="font-family:'Azeret Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--blue);margin-bottom:12px">One-Time Project</div>
+        <div style="font-family:'Azeret Mono',monospace;font-size:13px;color:var(--muted);margin-bottom:6px">Starting at</div>
+        <div style="font-size:42px;font-weight:700;color:var(--white);line-height:1;letter-spacing:-0.02em;margin-bottom:16px">$1,500</div>
+        <div style="font-size:13px;font-weight:300;color:var(--silver);line-height:1.7">A scoped, fixed-price build based on your specific requirements. You get a working demo first — if it's not right, you don't pay.</div>
+      </div>
+      <div style="background:var(--dark);padding:32px 28px">
+        <div style="font-family:'Azeret Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--blue);margin-bottom:12px">Ongoing Retainer</div>
+        <div style="font-family:'Azeret Mono',monospace;font-size:13px;color:var(--muted);margin-bottom:6px">Starting at</div>
+        <div style="font-size:42px;font-weight:700;color:var(--white);line-height:1;letter-spacing:-0.02em;margin-bottom:16px">$800<span style="font-size:18px;font-weight:400;color:var(--muted)">/mo</span></div>
+        <div style="font-size:13px;font-weight:300;color:var(--silver);line-height:1.7">For businesses that want ongoing updates, new features, and a developer on call. Scope and cadence agreed upfront — no surprises on the invoice.</div>
+      </div>
+    </div>
+
+    <div style="background:var(--panel);border:1px solid var(--divider);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:15px;font-weight:600;color:var(--white);margin-bottom:4px">Not sure what your project costs?</div>
+        <div style="font-size:13px;font-weight:300;color:var(--silver)">Tell me what you're trying to build. I'll send you a quote — and a working demo — quickly.</div>
+      </div>
+      <a class="btn-primary" href="mailto:cklok5174@gmail.com?subject=Quote Request&body=Here's what I'm trying to build:" style="white-space:nowrap;flex-shrink:0">Request a Quote</a>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2 class="cta-headline">Ready to find out what's actually slowing you down?</h2>
+  <p class="cta-sub">Send me a two-sentence description of your business and what's bugging you — I'll come back with real ideas, not a sales pitch.</p>
+  <a class="btn-primary" href="klokventures-intake.html">Send Me a Demo Request</a>
+  <p style="margin-top:20px;font-size:13px;color:var(--muted)">Or email directly: <a class="cta-email" href="mailto:cklok5174@gmail.com">cklok5174@gmail.com</a></p>
+</div>
+
+<footer>
+  <div class="footer-logo">Klok<span>Ventures</span></div>
+  <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+    <a href="klokventures-privacy-policy.html" style="font-family:'Azeret Mono',monospace;font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.15s" onmouseover="this.style.color='#F2F0EC'" onmouseout="this.style.color='#6A6A76'">Privacy Policy</a>
+    <a href="klokventures-terms-of-service.html" style="font-family:'Azeret Mono',monospace;font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.15s" onmouseover="this.style.color='#F2F0EC'" onmouseout="this.style.color='#6A6A76'">Terms of Service</a>
+    <a href="klokventures-client-services-agreement.html" style="font-family:'Azeret Mono',monospace;font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.15s" onmouseover="this.style.color='#F2F0EC'" onmouseout="this.style.color='#6A6A76'">Client Agreement</a>
+    <a href="klokventures-brand.html" style="font-family:'Azeret Mono',monospace;font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:0.08em;transition:color 0.15s" onmouseover="this.style.color='#F2F0EC'" onmouseout="this.style.color='#6A6A76'">Brand Guidelines</a>
+  </div>
+  <div class="footer-copy">© 2026 Connor Klok · All rights reserved</div>
+</footer>
+
+<script>
+  // Live clock in nav
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('nav-clock').textContent = h + ':' + m + ':' + s;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BuildLog — Field Operations</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --steel: #1C2B3A;
+    --rust: #C94B1E;
+    --amber: #F5A623;
+    --concrete: #8A9BA8;
+    --chalk: #EDF0F2;
+    --white: #FFFFFF;
+    --green: #2E7D4F;
+    --yellow: #E8B94A;
+  }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--steel);
+    color: var(--chalk);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  .app-header {
+    background: #111C27;
+    border-bottom: 3px solid var(--rust);
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .app-logo {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: 0.04em;
+    color: var(--white);
+  }
+  .app-logo span { color: var(--rust); }
+  .badge {
+    background: var(--rust);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  /* PROJECT BANNER */
+  .project-banner {
+    background: linear-gradient(135deg, #0F1E2B 0%, #1C2B3A 100%);
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .project-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--concrete);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .project-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+  .project-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .meta-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--concrete);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .meta-chip .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--amber);
+    display: inline-block;
+  }
+  .meta-chip .dot.green { background: var(--green); }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .stat-cell {
+    background: var(--steel);
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 30px;
+    line-height: 1;
+    color: var(--white);
+  }
+  .stat-num.rust { color: var(--rust); }
+  .stat-num.amber { color: var(--amber); }
+  .stat-num.green { color: #4CAF80; }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--concrete);
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    background: #111C27;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 12px 18px;
+    color: var(--concrete);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    user-select: none;
+  }
+  .tab.active {
+    color: var(--white);
+    border-bottom-color: var(--rust);
+  }
+  .tab:hover:not(.active) { color: var(--chalk); }
+
+  /* CONTENT */
+  .content { flex: 1; padding: 16px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* PUNCH LIST */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--concrete);
+  }
+  .btn-add {
+    background: var(--rust);
+    color: white;
+    border: none;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-add:hover { background: #B03A12; }
+
+  .punch-item {
+    background: #111C27;
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 8px;
+    border-left: 4px solid var(--rust);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .punch-item.resolved { border-left-color: var(--green); opacity: 0.7; }
+  .punch-item.warning { border-left-color: var(--amber); }
+
+  .punch-check {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--concrete);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.15s;
+  }
+  .punch-item.resolved .punch-check {
+    background: var(--green);
+    border-color: var(--green);
+    color: white;
+  }
+
+  .punch-body { flex: 1; }
+  .punch-title {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--chalk);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .punch-item.resolved .punch-title { text-decoration: line-through; color: var(--concrete); }
+  .punch-meta-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .punch-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.07);
+    color: var(--concrete);
+  }
+  .punch-tag.critical { background: rgba(201,75,30,0.2); color: #F07050; }
+  .punch-tag.warning { background: rgba(245,166,35,0.2); color: var(--amber); }
+  .punch-assignee {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--concrete);
+  }
+
+  /* PHOTO UPLOAD AREA */
+  .photo-strip {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    overflow-x: auto;
+  }
+  .photo-thumb {
+    width: 52px; height: 52px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.06);
+    border: 1px dashed rgba(255,255,255,0.15);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  .photo-thumb.filled {
+    background: #2A3A4A;
+    border-style: solid;
+    border-color: rgba(255,255,255,0.1);
+    font-size: 22px;
+  }
+
+  /* DAILY LOG */
+  .log-entry {
+    background: #111C27;
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .log-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--rust);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .log-text {
+    font-size: 14px;
+    color: var(--chalk);
+    line-height: 1.55;
+  }
+  .log-crew {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .crew-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 2px;
+    color: var(--concrete);
+  }
+
+  /* WEATHER ROW */
+  .weather-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    align-items: center;
+  }
+  .weather-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--amber);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* LOG INPUT */
+  .log-input-card {
+    background: #111C27;
+    border: 2px dashed rgba(255,255,255,0.12);
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .log-textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--chalk);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    resize: none;
+    min-height: 72px;
+  }
+  .log-textarea::placeholder { color: var(--concrete); }
+  .log-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .btn-log {
+    background: var(--rust);
+    color: white;
+    border: none;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--concrete);
+    border: 1px solid rgba(255,255,255,0.12);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  /* CREW TAB */
+  .crew-card {
+    background: #111C27;
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .crew-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    color: white;
+    flex-shrink: 0;
+  }
+  .crew-info { flex: 1; }
+  .crew-name {
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--chalk);
+  }
+  .crew-role {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--concrete);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .crew-hours {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--amber);
+    text-align: right;
+  }
+  .crew-hrs-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--concrete);
+    text-align: right;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green);
+    color: white;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 4px;
+    z-index: 999;
+    transition: transform 0.25s ease;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap {
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px;
+    height: 6px;
+    margin-top: 10px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--rust), var(--amber));
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  /* ADD ITEM MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 200;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    background: #1C2B3A;
+    border-top: 3px solid var(--rust);
+    border-radius: 8px 8px 0 0;
+    padding: 20px 16px 32px;
+    width: 100%;
+    max-width: 500px;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+  .field-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--concrete);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    display: block;
+  }
+  .field-input {
+    width: 100%;
+    background: #111C27;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 3px;
+    color: var(--chalk);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    padding: 9px 11px;
+    outline: none;
+    margin-bottom: 12px;
+  }
+  .field-input:focus { border-color: var(--rust); }
+  .field-select {
+    width: 100%;
+    background: #111C27;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 3px;
+    color: var(--chalk);
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+    padding: 9px 11px;
+    outline: none;
+    margin-bottom: 12px;
+    appearance: none;
+  }
+  .modal-btns { display: flex; gap: 8px; margin-top: 4px; }
+
+  /* SAFETY LOG TAB */
+  .safety-item {
+    background: #111C27;
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 8px;
+    border-left: 4px solid var(--amber);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .safety-item.incident { border-left-color: var(--rust); }
+  .safety-item.cleared { border-left-color: var(--green); opacity: 0.7; }
+  .safety-icon { font-size: 20px; flex-shrink: 0; }
+  .safety-body { flex: 1; }
+  .safety-title { font-weight: 500; font-size: 14px; color: var(--chalk); margin-bottom: 3px; }
+  .safety-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--concrete); }
+  .safety-sev {
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 2px 7px; border-radius: 2px; margin-top: 5px; display: inline-block;
+  }
+  .safety-sev.hazard { background: rgba(245,166,35,0.2); color: var(--amber); }
+  .safety-sev.incident { background: rgba(201,75,30,0.2); color: #F07050; }
+  .safety-sev.near-miss { background: rgba(255,255,255,0.07); color: var(--concrete); }
+
+  .change-order-item {
+    background: #111C27;
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 8px;
+    border-left: 4px solid var(--amber);
+  }
+  .co-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .co-title { font-weight: 500; font-size: 14px; color: var(--chalk); }
+  .co-amount { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 16px; color: var(--amber); }
+  .co-meta { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--concrete); margin-bottom: 6px; }
+  .co-desc { font-size: 12px; color: var(--concrete); line-height: 1.45; }
+  .co-status {
+    display: inline-block; margin-top: 7px; font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 2px;
+  }
+  .co-status.pending { background: rgba(245,166,35,0.2); color: var(--amber); }
+  .co-status.approved { background: rgba(46,125,79,0.2); color: #4CAF80; }
+
+  .checkin-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .checkin-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0;
+  }
+  .checkin-dot.absent { background: var(--rust); }
+  .checkin-time { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--concrete); }
+
+  /* VALUE TAB */
+  .value-panel { padding: 20px 16px 40px; }
+  .value-hero {
+    background: #111C27;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--rust);
+  }
+  .value-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 8px;
+  }
+  .value-headline {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 1.15;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+  .value-sub {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--concrete);
+    line-height: 1.6;
+  }
+
+  .value-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--concrete);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .pain-card {
+    background: #111C27;
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .pain-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .pain-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--chalk);
+    margin-bottom: 3px;
+  }
+  .pain-desc {
+    font-size: 13px;
+    color: var(--concrete);
+    line-height: 1.5;
+  }
+
+  .roi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .roi-cell {
+    background: #111C27;
+    border-radius: 4px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .roi-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    color: var(--amber);
+    line-height: 1;
+  }
+  .roi-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--concrete);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  .feature-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 13px;
+    color: var(--chalk);
+  }
+  .feature-row:last-child { border-bottom: none; }
+  .check-icon {
+    color: var(--green);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .cta-value-card {
+    background: var(--rust);
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .cta-value-headline {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--white);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+  .cta-value-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .cta-value-btn {
+    display: inline-block;
+    background: var(--white);
+    color: var(--rust);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 11px 24px;
+    border-radius: 3px;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-logo">Build<span>Log</span></div>
+  <div class="badge">● OFFLINE</div>
+</header>
+
+<div class="project-banner">
+  <div class="project-eyebrow">Active Project</div>
+  <div class="project-name">Riverside Lofts — Phase 2</div>
+  <div class="project-meta">
+    <div class="meta-chip"><span class="dot"></span> 14 days to handoff</div>
+    <div class="meta-chip"><span class="dot green"></span> On schedule</div>
+    <div class="meta-chip">Foreman: D. Morales</div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" style="width:72%"></div>
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-cell">
+    <div class="stat-num rust" id="open-count">7</div>
+    <div class="stat-label">Open Items</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-num green">18</div>
+    <div class="stat-label">Resolved</div>
+  </div>
+  <div class="stat-cell">
+    <div class="stat-num amber">3</div>
+    <div class="stat-label">Photos Today</div>
+  </div>
+</div>
+
+<nav class="tabs">
+  <div class="tab active" data-tab="punch">Punch List</div>
+  <div class="tab" data-tab="log">Daily Log</div>
+  <div class="tab" data-tab="crew">Crew</div>
+  <div class="tab" data-tab="safety">Safety</div>
+  <div class="tab" data-tab="changes">Change Orders</div>
+  <div class="tab" data-tab="value" style="color:var(--amber)">★ Why This App</div>
+</nav>
+
+<div class="content">
+
+  <!-- PUNCH LIST -->
+  <div class="panel active" id="panel-punch">
+    <div class="section-header">
+      <div class="section-title">Open Items</div>
+      <button class="btn-add" onclick="openModal()">+ Add Item</button>
+    </div>
+
+    <div id="punch-list">
+      <div class="punch-item" onclick="togglePunch(this)">
+        <div class="punch-check"></div>
+        <div class="punch-body">
+          <div class="punch-title">Unit 4B — drywall gap at window header, northeast corner</div>
+          <div class="punch-meta-row">
+            <span class="punch-tag critical">Critical</span>
+            <span class="punch-tag">Drywall</span>
+            <span class="punch-assignee">→ R. Espinoza</span>
+          </div>
+          <div class="photo-strip">
+            <div class="photo-thumb filled">📷</div>
+            <div class="photo-thumb filled">📷</div>
+            <div class="photo-thumb">+</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="punch-item warning" onclick="togglePunch(this)">
+        <div class="punch-check"></div>
+        <div class="punch-body">
+          <div class="punch-title">Lobby — grout haze on floor tile, entire entry zone</div>
+          <div class="punch-meta-row">
+            <span class="punch-tag warning">Watch</span>
+            <span class="punch-tag">Tile</span>
+            <span class="punch-assignee">→ K. Huang</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="punch-item" onclick="togglePunch(this)">
+        <div class="punch-check"></div>
+        <div class="punch-body">
+          <div class="punch-title">Stairwell B — handrail bracket loose at landing 3</div>
+          <div class="punch-meta-row">
+            <span class="punch-tag critical">Critical</span>
+            <span class="punch-tag">Safety</span>
+            <span class="punch-assignee">→ M. Torres</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="punch-item" onclick="togglePunch(this)">
+        <div class="punch-check"></div>
+        <div class="punch-body">
+          <div class="punch-title">Unit 2A kitchen — cabinet door alignment off by ~4mm</div>
+          <div class="punch-meta-row">
+            <span class="punch-tag">Finish</span>
+            <span class="punch-tag">Cabinetry</span>
+            <span class="punch-assignee">→ R. Espinoza</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header" style="margin-top:20px">
+        <div class="section-title">Resolved</div>
+      </div>
+
+      <div class="punch-item resolved" onclick="togglePunch(this)">
+        <div class="punch-check">✓</div>
+        <div class="punch-body">
+          <div class="punch-title">Rooftop — waterproofing membrane edge sealed</div>
+          <div class="punch-meta-row">
+            <span class="punch-tag">Roofing</span>
+            <span class="punch-assignee">→ J. Webb</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="punch-item resolved" onclick="togglePunch(this)">
+        <div class="punch-check">✓</div>
+        <div class="punch-body">
+          <div class="punch-title">Unit 3C — HVAC register cover missing, replaced</div>
+          <div class="punch-meta-row">
+            <span class="punch-tag">HVAC</span>
+            <span class="punch-assignee">→ T. Nguyen</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAILY LOG -->
+  <div class="panel" id="panel-log">
+    <div class="log-input-card">
+      <textarea class="log-textarea" id="log-input" placeholder="Log today's work, conditions, decisions…"></textarea>
+      <div class="log-actions">
+        <button class="btn-log" onclick="addLog()">Save Log</button>
+        <button class="btn-ghost">📷 Photo</button>
+        <button class="btn-ghost">🌤 Weather</button>
+      </div>
+    </div>
+
+    <div id="log-entries">
+      <div class="log-entry">
+        <div class="log-date">Tue Jun 24 · 7:14 AM</div>
+        <div class="log-text">Framing crew completed north wall rough-in on floors 3–5. Electrical rough-in started in Units 4A–4D. Inspector signed off on structural steel connections. Minor delay on stairwell B handrail delivery — parts expected Thursday AM.</div>
+        <div class="weather-row">
+          <div class="weather-chip">☀️ 81°F</div>
+          <div class="weather-chip">💨 12 mph wind</div>
+        </div>
+        <div class="log-crew">
+          <span class="crew-tag">Framing ×6</span>
+          <span class="crew-tag">Electrical ×3</span>
+          <span class="crew-tag">Inspection ×1</span>
+        </div>
+      </div>
+
+      <div class="log-entry">
+        <div class="log-date">Mon Jun 23 · 6:58 AM</div>
+        <div class="log-text">Concrete pour on 6th floor deck completed by 10:30 AM. Cure blankets placed. Tile crew finished lobby install — grout haze issue noted, logged as punch item. Safety walkthrough completed, one corrective item (stairwell rail).</div>
+        <div class="weather-row">
+          <div class="weather-chip">⛅ 74°F</div>
+        </div>
+        <div class="log-crew">
+          <span class="crew-tag">Concrete ×8</span>
+          <span class="crew-tag">Tile ×4</span>
+          <span class="crew-tag">Safety ×1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREW -->
+  <div class="panel" id="panel-crew">
+    <div class="section-header">
+      <div class="section-title">On Site Today</div>
+      <div class="badge">14 workers</div>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--concrete);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.07)">Check-in Status</div>
+
+    <div class="crew-card">
+      <div class="crew-avatar" style="background:#C94B1E">DM</div>
+      <div class="crew-info">
+        <div class="crew-name">Diego Morales</div>
+        <div class="crew-role">Foreman</div>
+        <div class="checkin-row" style="border:none;padding:4px 0 0">
+          <div style="display:flex;align-items:center;gap:6px"><div class="checkin-dot"></div><span class="checkin-time">Checked in 6:48 AM</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="crew-hours">9.5</div>
+        <div class="crew-hrs-label">hrs today</div>
+      </div>
+    </div>
+
+    <div class="crew-card">
+      <div class="crew-avatar" style="background:#2E5E8A">RE</div>
+      <div class="crew-info">
+        <div class="crew-name">Rosa Espinoza</div>
+        <div class="crew-role">Lead Carpenter</div>
+        <div class="checkin-row" style="border:none;padding:4px 0 0">
+          <div style="display:flex;align-items:center;gap:6px"><div class="checkin-dot"></div><span class="checkin-time">Checked in 7:02 AM</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="crew-hours">8.0</div>
+        <div class="crew-hrs-label">hrs today</div>
+      </div>
+    </div>
+
+    <div class="crew-card">
+      <div class="crew-avatar" style="background:#2E7D4F">MT</div>
+      <div class="crew-info">
+        <div class="crew-name">Marco Torres</div>
+        <div class="crew-role">Ironworker</div>
+        <div class="checkin-row" style="border:none;padding:4px 0 0">
+          <div style="display:flex;align-items:center;gap:6px"><div class="checkin-dot"></div><span class="checkin-time">Checked in 7:10 AM</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="crew-hours">8.5</div>
+        <div class="crew-hrs-label">hrs today</div>
+      </div>
+    </div>
+
+    <div class="crew-card">
+      <div class="crew-avatar" style="background:#6B3FA0">KH</div>
+      <div class="crew-info">
+        <div class="crew-name">Kevin Huang</div>
+        <div class="crew-role">Tile Setter</div>
+        <div class="checkin-row" style="border:none;padding:4px 0 0">
+          <div style="display:flex;align-items:center;gap:6px"><div class="checkin-dot"></div><span class="checkin-time">Checked in 7:31 AM</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="crew-hours">7.5</div>
+        <div class="crew-hrs-label">hrs today</div>
+      </div>
+    </div>
+
+    <div class="crew-card">
+      <div class="crew-avatar" style="background:#8A6A1E">TN</div>
+      <div class="crew-info">
+        <div class="crew-name">Thanh Nguyen</div>
+        <div class="crew-role">HVAC Tech</div>
+        <div class="checkin-row" style="border:none;padding:4px 0 0">
+          <div style="display:flex;align-items:center;gap:6px"><div class="checkin-dot absent"></div><span class="checkin-time" style="color:var(--rust)">Not checked in — called out</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="crew-hours">0.0</div>
+        <div class="crew-hrs-label">hrs today</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAFETY LOG -->
+  <div class="panel" id="panel-safety">
+    <div class="section-header">
+      <div class="section-title">Safety Log</div>
+      <button class="btn-add" onclick="showToast('Log safety event')">+ Log Event</button>
+    </div>
+    <div style="background:#111C27;border-radius:4px;padding:10px 14px;margin-bottom:14px;display:flex;gap:16px">
+      <div style="text-align:center;flex:1">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:28px;color:#4CAF80">14</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--concrete);margin-top:2px">Days Incident-Free</div>
+      </div>
+      <div style="text-align:center;flex:1">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:28px;color:var(--amber)">2</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--concrete);margin-top:2px">Open Hazards</div>
+      </div>
+      <div style="text-align:center;flex:1">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:28px;color:var(--concrete)">1</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--concrete);margin-top:2px">Near-Miss This Month</div>
+      </div>
+    </div>
+
+    <div class="safety-item">
+      <div class="safety-icon">⚠️</div>
+      <div class="safety-body">
+        <div class="safety-title">Stairwell B — unsecured rebar at landing 3</div>
+        <div class="safety-meta">Jun 24 · 7:42 AM · Reported by D. Morales</div>
+        <div class="safety-sev hazard">Hazard</div>
+      </div>
+    </div>
+    <div class="safety-item">
+      <div class="safety-icon">⚠️</div>
+      <div class="safety-body">
+        <div class="safety-title">Floor 5 — open penetration near elevator shaft, no barrier</div>
+        <div class="safety-meta">Jun 24 · 9:15 AM · Reported by R. Espinoza</div>
+        <div class="safety-sev hazard">Hazard</div>
+      </div>
+    </div>
+    <div class="safety-item cleared">
+      <div class="safety-icon">✅</div>
+      <div class="safety-body">
+        <div class="safety-title">Lobby — wet concrete spill, slip risk — cleaned and barriered</div>
+        <div class="safety-meta">Jun 23 · 11:04 AM · Cleared 12:30 PM</div>
+        <div class="safety-sev" style="background:rgba(46,125,79,0.2);color:#4CAF80">Cleared</div>
+      </div>
+    </div>
+    <div class="safety-item" style="border-left-color:var(--concrete)">
+      <div class="safety-icon">🔶</div>
+      <div class="safety-body">
+        <div class="safety-title">Unit 3A — worker nearly struck by falling drywall scrap from above</div>
+        <div class="safety-meta">Jun 20 · 2:18 PM · Reported by K. Huang</div>
+        <div class="safety-sev near-miss">Near-Miss</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHANGE ORDERS -->
+  <div class="panel" id="panel-changes">
+    <div class="section-header">
+      <div class="section-title">Change Orders</div>
+      <button class="btn-add" onclick="showToast('New change order')">+ New CO</button>
+    </div>
+    <div style="background:#111C27;border-radius:4px;padding:10px 14px;margin-bottom:14px;display:flex;gap:16px">
+      <div style="text-align:center;flex:1">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;color:var(--amber)">$48,200</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--concrete);margin-top:2px">Pending Approval</div>
+      </div>
+      <div style="text-align:center;flex:1">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:24px;color:#4CAF80">$112,500</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--concrete);margin-top:2px">Approved This Phase</div>
+      </div>
+    </div>
+
+    <div class="change-order-item">
+      <div class="co-header">
+        <div class="co-title">CO-014 — Structural reinforcement, floor 4 beam</div>
+        <div class="co-amount">+$32,400</div>
+      </div>
+      <div class="co-meta">Submitted Jun 22 · Owner: Westside Development</div>
+      <div class="co-desc">Unforeseen condition: existing concrete slab below spec. Engineer-directed addition of 3 steel beams at column lines B4, C4, D4 per revised structural drawings.</div>
+      <div class="co-status pending">Awaiting Approval</div>
+    </div>
+
+    <div class="change-order-item">
+      <div class="co-header">
+        <div class="co-title">CO-013 — Upgrade lobby tile to porcelain pavers</div>
+        <div class="co-amount">+$15,800</div>
+      </div>
+      <div class="co-meta">Submitted Jun 18 · Owner: Westside Development</div>
+      <div class="co-desc">Owner-directed substitution from ceramic to large-format porcelain pavers (24×48) with additional waterproofing membrane.</div>
+      <div class="co-status pending">Awaiting Approval</div>
+    </div>
+
+    <div class="change-order-item" style="border-left-color:var(--green);opacity:0.8">
+      <div class="co-header">
+        <div class="co-title">CO-012 — Additional MEP rough-in, Units 5A–5D</div>
+        <div class="co-amount">+$28,700</div>
+      </div>
+      <div class="co-meta">Approved Jun 14 · Signed by J. Kim (Owner's Rep)</div>
+      <div class="co-desc">Design revision added two additional circuits and hot/cold rough-in per revised unit layouts.</div>
+      <div class="co-status approved">Approved</div>
+    </div>
+  </div>
+
+
+  <!-- VALUE PANEL -->
+  <div class="panel" id="panel-value">
+    <div class="value-panel">
+
+      <div class="value-hero">
+        <div class="value-eyebrow">Built for Construction & Trades</div>
+        <div class="value-headline">One app that protects your margins, your crew, and your reputation on every job.</div>
+        <div class="value-sub">BuildLog gives PMs, foremen, and GCs a single field tool for punch lists, daily documentation, safety logging, and change order tracking — from any phone, even without signal. Everything is timestamped, assigned, and defensible.</div>
+      </div>
+
+      <div class="value-section-title" style="margin-bottom:10px">Pain Points This Eliminates</div>
+
+      <div class="pain-card">
+        <div class="pain-icon">⚖️</div>
+        <div>
+          <div class="pain-title">Change order disputes that cost you money</div>
+          <div class="pain-desc">Without a paper trail, owners push back or claim approval never happened. The Change Orders tab timestamps every submission, captures scope, and tracks approval status — legal defensibility on every dollar.</div>
+        </div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">🦺</div>
+        <div>
+          <div class="pain-title">Safety incidents with no documentation</div>
+          <div class="pain-desc">OSHA violations and liability claims hinge on what you can prove you knew and when. The Safety Log creates a timestamped, attributed record of every hazard, near-miss, and corrective action — your first line of defense.</div>
+        </div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">📋</div>
+        <div>
+          <div class="pain-title">Punch list items falling through the cracks at handoff</div>
+          <div class="pain-desc">Paper lists get lost, photos don't attach, and the GC never has the current version. Every item here is assigned, photo-documented, and severity-flagged — so handoff is clean and warranty disputes are rare.</div>
+        </div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">👷</div>
+        <div>
+          <div class="pain-title">No visibility into who's actually on site</div>
+          <div class="pain-desc">Subcontractor no-shows cascade into schedule delays with no warning. Crew check-in status and flagged absences mean you know by 8 AM whether you have a coverage problem — before it becomes a delay claim.</div>
+        </div>
+      </div>
+      <div class="pain-card">
+        <div class="pain-icon">📵</div>
+        <div>
+          <div class="pain-title">No internet kills documentation mid-job</div>
+          <div class="pain-desc">Steel framing, concrete floors, and remote sites all kill cell signal. BuildLog is offline-first — all logs, photos, and punch updates capture locally and sync the moment signal returns.</div>
+        </div>
+      </div>
+      <div class="pain-card" style="margin-bottom:20px">
+        <div class="pain-icon">🧾</div>
+        <div>
+          <div class="pain-title">Daily reports written from memory at end of week</div>
+          <div class="pain-desc">Foremen reconstructing logs on Friday miss details that matter in disputes. The Daily Log captures crew counts, weather, decisions, and subcontractor activity in real time — searchable and exportable.</div>
+        </div>
+      </div>
+
+      <div class="value-section-title">The Numbers</div>
+      <div class="roi-grid">
+        <div class="roi-cell">
+          <div class="roi-num">3h</div>
+          <div class="roi-label">Saved per PM per week on paperwork & reporting</div>
+        </div>
+        <div class="roi-cell">
+          <div class="roi-num">68%</div>
+          <div class="roi-label">Fewer punch items missed at owner handoff</div>
+        </div>
+        <div class="roi-cell">
+          <div class="roi-num">$0</div>
+          <div class="roi-label">App store fees — installs via link on any phone</div>
+        </div>
+        <div class="roi-cell">
+          <div class="roi-num">1 day</div>
+          <div class="roi-label">Crew onboarding — no training required</div>
+        </div>
+      </div>
+
+      <div class="value-section-title">What's Included</div>
+      <div style="background:#111C27;border-radius:4px;padding:4px 14px;margin-bottom:20px">
+        <div class="feature-row"><span class="check-icon">✓</span>Punch list with photo documentation, severity flags & assignments</div>
+        <div class="feature-row"><span class="check-icon">✓</span>Daily log with crew count, weather, and timestamped entries</div>
+        <div class="feature-row"><span class="check-icon">✓</span>Safety log — hazards, near-misses, incidents with timestamps</div>
+        <div class="feature-row"><span class="check-icon">✓</span>Change order tracker with scope, amount, and approval status</div>
+        <div class="feature-row"><span class="check-icon">✓</span>Crew check-in status and hours per trade per day</div>
+        <div class="feature-row"><span class="check-icon">✓</span>Full offline functionality — works anywhere on site</div>
+        <div class="feature-row"><span class="check-icon">✓</span>Custom-branded with your company name & colors</div>
+        <div class="feature-row"><span class="check-icon">✓</span>PDF export for owner and GC handoff packages</div>
+      </div>
+
+      <div class="cta-value-card">
+        <div class="cta-value-headline">Ready to see it with your project?</div>
+        <div class="cta-value-sub">We'll configure a live version with your branding and a real job in 24 hours — free demo, no commitment.</div>
+        <a class="cta-value-btn" href="mailto:you@youremail.com?subject=BuildLog Demo Request">Get Your Custom Demo</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-title">New Punch Item</div>
+    <label class="field-label">Description</label>
+    <input class="field-input" id="new-title" type="text" placeholder="Describe the issue…">
+    <label class="field-label">Priority</label>
+    <select class="field-select" id="new-priority">
+      <option value="">Standard</option>
+      <option value="critical">Critical</option>
+      <option value="warning">Watch</option>
+    </select>
+    <label class="field-label">Assign To</label>
+    <select class="field-select" id="new-assignee">
+      <option>D. Morales</option>
+      <option>R. Espinoza</option>
+      <option>M. Torres</option>
+      <option>K. Huang</option>
+      <option>T. Nguyen</option>
+    </select>
+    <div class="modal-btns">
+      <button class="btn-log" onclick="addPunchItem()">Add to List</button>
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Tabs
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Toggle punch items
+  function togglePunch(el) {
+    el.classList.toggle('resolved');
+    const check = el.querySelector('.punch-check');
+    check.textContent = el.classList.contains('resolved') ? '✓' : '';
+    updateOpenCount();
+    showToast(el.classList.contains('resolved') ? 'Item resolved ✓' : 'Item reopened');
+  }
+
+  function updateOpenCount() {
+    const open = document.querySelectorAll('#punch-list .punch-item:not(.resolved)').length;
+    document.getElementById('open-count').textContent = open;
+  }
+
+  // Modal
+  function openModal() {
+    document.getElementById('modal').classList.add('open');
+  }
+  function closeModal(e) {
+    if (!e || e.target === document.getElementById('modal')) {
+      document.getElementById('modal').classList.remove('open');
+    }
+  }
+
+  function addPunchItem() {
+    const title = document.getElementById('new-title').value.trim();
+    if (!title) return;
+    const priority = document.getElementById('new-priority').value;
+    const assignee = document.getElementById('new-assignee').value;
+
+    const item = document.createElement('div');
+    item.className = 'punch-item' + (priority === 'warning' ? ' warning' : '');
+    item.onclick = function() { togglePunch(this); };
+
+    const tagHtml = priority === 'critical'
+      ? '<span class="punch-tag critical">Critical</span>'
+      : priority === 'warning'
+      ? '<span class="punch-tag warning">Watch</span>'
+      : '';
+
+    item.innerHTML = `
+      <div class="punch-check"></div>
+      <div class="punch-body">
+        <div class="punch-title">${title}</div>
+        <div class="punch-meta-row">
+          ${tagHtml}
+          <span class="punch-assignee">→ ${assignee}</span>
+        </div>
+      </div>`;
+
+    document.getElementById('punch-list').insertBefore(item, document.getElementById('punch-list').firstChild);
+    document.getElementById('new-title').value = '';
+    document.getElementById('new-priority').value = '';
+    closeModal();
+    updateOpenCount();
+    showToast('Item added to punch list');
+  }
+
+  // Add log entry
+  function addLog() {
+    const text = document.getElementById('log-input').value.trim();
+    if (!text) return;
+    const now = new Date();
+    const dateStr = now.toDateString().slice(0, 10) + ' · ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.innerHTML = `<div class="log-date">${dateStr}</div><div class="log-text">${text}</div>`;
+    document.getElementById('log-entries').insertBefore(entry, document.getElementById('log-entries').firstChild);
+    document.getElementById('log-input').value = '';
+    showToast('Log saved');
+  }
+
+  // Toast
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+</script>
+<style>.kw-watermark{position:fixed;bottom:12px;right:12px;z-index:99999;background:rgba(0,0,0,0.55);color:rgba(255,255,255,0.85);font-family:monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:5px 10px;border-radius:3px;pointer-events:none;backdrop-filter:blur(4px)}</style><div class="kw-watermark">Demo · klok-ventures.com</div></body>
+</html>

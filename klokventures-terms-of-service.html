@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="klokventures-favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service — Klok Ventures</title>
+<style>
+/* Shared styles matching klok-ventures.com */
+@import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@300;400;500;700&family=Sora:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0E0E10;
+  --dark: #16161A;
+  --panel: #1E1E24;
+  --blue: #2D6BE4;
+  --blue-dim: #1A4BA8;
+  --silver: #C8CAD0;
+  --white: #F2F0EC;
+  --muted: #6A6A76;
+  --divider: rgba(200,202,208,0.1);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Sora', sans-serif; background: var(--black); color: var(--white); line-height: 1.6; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 56px;
+  background: rgba(14,14,16,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--divider);
+}
+.nav-logo { font-family: 'Azeret Mono', monospace; font-size: 16px; font-weight: 700; color: var(--white); letter-spacing: 0.04em; text-decoration: none; }
+.nav-logo span { color: var(--blue); }
+.nav-clock { font-family: 'Azeret Mono', monospace; font-size: 13px; color: var(--muted); letter-spacing: 0.1em; }
+.nav-cta { font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); border: 1px solid var(--blue); padding: 7px 14px; text-decoration: none; transition: background 0.15s, color 0.15s; }
+.nav-cta:hover { background: var(--blue); color: white; }
+
+/* LEGAL PAGE LAYOUT */
+.legal-hero {
+  min-height: 40vh; display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 80px 24px 48px; position: relative; overflow: hidden; max-width: 100%;
+}
+.hero-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(var(--divider) 1px, transparent 1px), linear-gradient(90deg, var(--divider) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.3) 80%, transparent 100%);
+}
+.legal-eyebrow { font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; }
+.legal-title { font-size: clamp(28px, 6vw, 52px); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; color: var(--white); margin-bottom: 14px; }
+.legal-sub { font-size: 14px; font-weight: 300; color: var(--silver); max-width: 520px; line-height: 1.7; }
+.legal-meta { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.1em; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--divider); display: flex; gap: 24px; flex-wrap: wrap; }
+
+/* CONTENT */
+.legal-body { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+
+.legal-section { margin-bottom: 40px; }
+
+.legal-h1 { font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--divider); letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
+.legal-h1-num { font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 500; color: var(--blue); letter-spacing: 0.14em; }
+
+.legal-h2 { font-size: 13px; font-weight: 700; color: var(--silver); margin: 20px 0 8px; letter-spacing: 0.04em; text-transform: uppercase; font-family: 'Azeret Mono', monospace; }
+
+.legal-p { font-size: 14px; font-weight: 300; color: var(--silver); line-height: 1.8; margin-bottom: 12px; }
+.legal-p a { color: var(--blue); text-decoration: none; }
+.legal-p a:hover { text-decoration: underline; }
+
+.legal-ul { list-style: none; margin: 0 0 14px 0; display: flex; flex-direction: column; gap: 6px; }
+.legal-ul li { font-size: 14px; font-weight: 300; color: var(--silver); line-height: 1.7; display: flex; gap: 12px; align-items: flex-start; }
+.legal-ul li::before { content: '→'; font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--blue); flex-shrink: 0; margin-top: 3px; }
+
+/* HIGHLIGHT BOX */
+.legal-highlight { background: var(--panel); border: 1px solid var(--divider); border-left: 3px solid var(--blue); padding: 18px 20px; margin-bottom: 16px; }
+.legal-highlight p { font-size: 13px; color: var(--silver); line-height: 1.75; margin: 0; }
+.legal-highlight strong { color: var(--white); font-weight: 600; }
+
+/* SIGNATURE BLOCK */
+.sig-block { background: var(--dark); border: 1px solid var(--divider); padding: 24px; margin-top: 8px; }
+.sig-label { font-family: 'Azeret Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--blue); margin-bottom: 16px; }
+.sig-line { border-bottom: 1px solid var(--silver); margin-bottom: 8px; height: 32px; }
+.sig-caption { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 20px; }
+
+/* DISCLAIMER */
+.legal-disclaimer { background: var(--panel); border: 1px solid var(--divider); padding: 16px 20px; margin-top: 40px; }
+.legal-disclaimer p { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.04em; line-height: 1.7; }
+
+/* FOOTER */
+footer { background: var(--dark); border-top: 1px solid var(--divider); padding: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.footer-logo { font-family: 'Azeret Mono', monospace; font-size: 14px; font-weight: 700; color: var(--muted); text-decoration: none; }
+.footer-logo span { color: var(--blue); }
+.footer-links { display: flex; gap: 20px; }
+.footer-links a { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); text-decoration: none; letter-spacing: 0.08em; transition: color 0.15s; }
+.footer-links a:hover { color: var(--white); }
+.footer-copy { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; }
+
+@media (max-width: 640px) { .nav-clock { display: none; } .legal-meta { gap: 12px; } }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html"><img src="klokventures-logo.png" alt="Klok Ventures" style="height:32px;width:32px;object-fit:contain;flex-shrink:0"> Klok<span>Ventures</span></a>
+  <div class="nav-clock" id="nav-clock">00:00:00</div>
+  <a class="nav-cta" href="mailto:cklok5174@gmail.com">Get in Touch</a>
+</nav>
+
+<div class="legal-hero">
+  <div class="hero-grid"></div>
+  <div class="legal-eyebrow">Klok Ventures · Legal</div>
+  <h1 class="legal-title">Terms of Service</h1>
+  <p class="legal-sub">Terms governing your use of klok-ventures.com and our demo applications.</p>
+  <div class="legal-meta">
+    <span>Effective: June 25, 2026</span>
+    <span>Applies to: klok-ventures.com</span>
+    <span>Governing Law: State of Michigan</span>
+  </div>
+</div>
+
+<div class="legal-body">
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">01</span> Acceptance of Terms</div>
+    <p class="legal-p">By accessing or using klok-ventures.com (the "Site"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree with any part of these Terms, please do not use this Site. These Terms apply to all visitors, users, and others who access or use the Site.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">02</span> Description of Services</div>
+    <p class="legal-p">Klok Ventures, operated by Connor Klok, provides digital product consulting services including the design and development of Progressive Web Applications (PWAs) for small and mid-size businesses. The Site serves as an informational and marketing platform for these services.</p>
+    <div class="legal-highlight">
+      <p><strong>Demo applications presented on this Site are prototypes intended for illustrative purposes only.</strong> They do not represent fully deployed commercial products and should not be relied upon as such.</p>
+    </div>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">03</span> Intellectual Property</div>
+    <div class="legal-h2">3.1 Our Content</div>
+    <p class="legal-p">All content on this Site — including but not limited to text, design, graphics, demo applications, and code — is the property of Connor Klok / Klok Ventures and is protected by applicable copyright and intellectual property laws. You may not reproduce, distribute, or create derivative works from our content without our express written permission.</p>
+    <div class="legal-h2">3.2 Demo Applications</div>
+    <p class="legal-p">The demo applications presented on this Site are proprietary works of Klok Ventures. They are made available for viewing and evaluation purposes only. You may not copy, reverse-engineer, redistribute, or use the demos as the basis for a commercial product without entering into a paid services agreement with us.</p>
+    <div class="legal-h2">3.3 Client Work</div>
+    <p class="legal-p">Intellectual property rights for custom applications developed for clients are governed by the applicable Client Services Agreement. Client work product is not covered by these Terms.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">04</span> Acceptable Use</div>
+    <p class="legal-p">You agree to use this Site only for lawful purposes. You may not:</p>
+    <ul class="legal-ul">
+      <li>Use the Site in any way that violates applicable local, state, national, or international laws or regulations</li>
+      <li>Attempt to gain unauthorized access to any part of the Site or its related systems</li>
+      <li>Transmit any unsolicited or unauthorized advertising or promotional material</li>
+      <li>Scrape, crawl, or otherwise extract data from the Site in an automated manner without our written consent</li>
+      <li>Use the demo applications for commercial purposes without a paid agreement</li>
+    </ul>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">05</span> Disclaimer of Warranties</div>
+    <p class="legal-p">This Site and its contents are provided on an "as is" and "as available" basis without warranties of any kind, either express or implied. Klok Ventures makes no warranty that the Site will be uninterrupted, error-free, or free of viruses or other harmful components.</p>
+    <p class="legal-p">Demo applications are provided for illustrative purposes and may not reflect the full functionality of a deployed product. Information on the Site regarding timelines, outcomes, or results is provided in good faith but is not guaranteed.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">06</span> Limitation of Liability</div>
+    <p class="legal-p">To the fullest extent permitted by applicable law, Klok Ventures and Connor Klok shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of or inability to use this Site, even if we have been advised of the possibility of such damages.</p>
+    <p class="legal-p">Our total liability to you for any claims arising out of or related to your use of this Site shall not exceed the amount you have paid to us in the twelve (12) months preceding the claim, or $100 USD, whichever is greater.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">07</span> Third-Party Links</div>
+    <p class="legal-p">This Site may contain links to third-party websites. These links are provided for your convenience only. We have no control over the content of those sites and accept no responsibility for them or for any loss or damage that may arise from your use of them.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">08</span> Privacy</div>
+    <p class="legal-p">Your use of this Site is also governed by our <a href="klokventures-privacy-policy.html">Privacy Policy</a>, which is incorporated into these Terms by reference. Please review our Privacy Policy to understand our practices.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">09</span> Modifications to Terms</div>
+    <p class="legal-p">We reserve the right to modify these Terms at any time. Changes will be effective immediately upon posting to the Site with an updated Effective Date. Your continued use of the Site after any changes constitutes your acceptance of the new Terms.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">10</span> Governing Law</div>
+    <p class="legal-p">These Terms shall be governed by and construed in accordance with the laws of the State of Michigan, United States, without regard to its conflict of law provisions. Any disputes arising under these Terms shall be subject to the exclusive jurisdiction of the courts located in Michigan.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">11</span> Contact</div>
+    <p class="legal-p">Questions about these Terms may be directed to:</p>
+    <div class="legal-highlight">
+      <p><strong>Connor Klok</strong> · Klok Ventures<br>
+      <a href="mailto:cklok5174@gmail.com">cklok5174@gmail.com</a> · <a href="https://klok-ventures.com">klok-ventures.com</a></p>
+    </div>
+  </div>
+
+  <div class="legal-disclaimer">
+    <p>Last updated: June 25, 2026 · © 2026 Connor Klok / Klok Ventures · All rights reserved</p>
+  </div>
+
+</div>
+
+<footer>
+  <a class="footer-logo" href="index.html">Klok<span>Ventures</span></a>
+  <div class="footer-links">
+    <a href="klokventures-privacy-policy.html">Privacy Policy</a>
+    <a href="klokventures-terms-of-service.html">Terms of Service</a>
+    <a href="index.html">Back to Site</a>
+  </div>
+  <div class="footer-copy">© 2026 Connor Klok</div>
+</footer>
+
+<script>
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('nav-clock').textContent = h+':'+m+':'+s;
+}
+updateClock(); setInterval(updateClock, 1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="klokventures-favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Services Agreement — Klok Ventures</title>
+<style>
+/* Shared styles matching klok-ventures.com */
+@import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@300;400;500;700&family=Sora:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0E0E10;
+  --dark: #16161A;
+  --panel: #1E1E24;
+  --blue: #2D6BE4;
+  --blue-dim: #1A4BA8;
+  --silver: #C8CAD0;
+  --white: #F2F0EC;
+  --muted: #6A6A76;
+  --divider: rgba(200,202,208,0.1);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Sora', sans-serif; background: var(--black); color: var(--white); line-height: 1.6; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 56px;
+  background: rgba(14,14,16,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--divider);
+}
+.nav-logo { font-family: 'Azeret Mono', monospace; font-size: 16px; font-weight: 700; color: var(--white); letter-spacing: 0.04em; text-decoration: none; }
+.nav-logo span { color: var(--blue); }
+.nav-clock { font-family: 'Azeret Mono', monospace; font-size: 13px; color: var(--muted); letter-spacing: 0.1em; }
+.nav-cta { font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); border: 1px solid var(--blue); padding: 7px 14px; text-decoration: none; transition: background 0.15s, color 0.15s; }
+.nav-cta:hover { background: var(--blue); color: white; }
+
+/* LEGAL PAGE LAYOUT */
+.legal-hero {
+  min-height: 40vh; display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 80px 24px 48px; position: relative; overflow: hidden; max-width: 100%;
+}
+.hero-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(var(--divider) 1px, transparent 1px), linear-gradient(90deg, var(--divider) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.3) 80%, transparent 100%);
+}
+.legal-eyebrow { font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; }
+.legal-title { font-size: clamp(28px, 6vw, 52px); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; color: var(--white); margin-bottom: 14px; }
+.legal-sub { font-size: 14px; font-weight: 300; color: var(--silver); max-width: 520px; line-height: 1.7; }
+.legal-meta { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.1em; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--divider); display: flex; gap: 24px; flex-wrap: wrap; }
+
+/* CONTENT */
+.legal-body { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+
+.legal-section { margin-bottom: 40px; }
+
+.legal-h1 { font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--divider); letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
+.legal-h1-num { font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 500; color: var(--blue); letter-spacing: 0.14em; }
+
+.legal-h2 { font-size: 13px; font-weight: 700; color: var(--silver); margin: 20px 0 8px; letter-spacing: 0.04em; text-transform: uppercase; font-family: 'Azeret Mono', monospace; }
+
+.legal-p { font-size: 14px; font-weight: 300; color: var(--silver); line-height: 1.8; margin-bottom: 12px; }
+.legal-p a { color: var(--blue); text-decoration: none; }
+.legal-p a:hover { text-decoration: underline; }
+
+.legal-ul { list-style: none; margin: 0 0 14px 0; display: flex; flex-direction: column; gap: 6px; }
+.legal-ul li { font-size: 14px; font-weight: 300; color: var(--silver); line-height: 1.7; display: flex; gap: 12px; align-items: flex-start; }
+.legal-ul li::before { content: '→'; font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--blue); flex-shrink: 0; margin-top: 3px; }
+
+/* HIGHLIGHT BOX */
+.legal-highlight { background: var(--panel); border: 1px solid var(--divider); border-left: 3px solid var(--blue); padding: 18px 20px; margin-bottom: 16px; }
+.legal-highlight p { font-size: 13px; color: var(--silver); line-height: 1.75; margin: 0; }
+.legal-highlight strong { color: var(--white); font-weight: 600; }
+
+/* SIGNATURE BLOCK */
+.sig-block { background: var(--dark); border: 1px solid var(--divider); padding: 24px; margin-top: 8px; }
+.sig-label { font-family: 'Azeret Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--blue); margin-bottom: 16px; }
+.sig-line { border-bottom: 1px solid var(--silver); margin-bottom: 8px; height: 32px; }
+.sig-caption { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 20px; }
+
+/* DISCLAIMER */
+.legal-disclaimer { background: var(--panel); border: 1px solid var(--divider); padding: 16px 20px; margin-top: 40px; }
+.legal-disclaimer p { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.04em; line-height: 1.7; }
+
+/* FOOTER */
+footer { background: var(--dark); border-top: 1px solid var(--divider); padding: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.footer-logo { font-family: 'Azeret Mono', monospace; font-size: 14px; font-weight: 700; color: var(--muted); text-decoration: none; }
+.footer-logo span { color: var(--blue); }
+.footer-links { display: flex; gap: 20px; }
+.footer-links a { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); text-decoration: none; letter-spacing: 0.08em; transition: color 0.15s; }
+.footer-links a:hover { color: var(--white); }
+.footer-copy { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; }
+
+@media (max-width: 640px) { .nav-clock { display: none; } .legal-meta { gap: 12px; } }
+
+/* CSA extras */
+.sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+.sig-block { background: var(--dark); border: 1px solid var(--divider); padding: 24px; }
+.sig-party { font-family: 'Azeret Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--blue); margin-bottom: 20px; }
+.sig-field { margin-bottom: 16px; }
+.sig-line { border-bottom: 1px solid var(--silver); height: 36px; margin-bottom: 5px; }
+.sig-label { font-family: 'Azeret Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 0.08em; }
+.scope-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+.scope-table td { font-size: 13px; padding: 10px 12px; border-bottom: 1px solid var(--divider); color: var(--silver); vertical-align: top; }
+.scope-table td:first-child { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.08em; width: 160px; white-space: nowrap; }
+@media (max-width: 640px) { .sig-grid { grid-template-columns: 1fr; } .scope-table td:first-child { width: auto; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html"><img src="klokventures-logo.png" alt="Klok Ventures" style="height:32px;width:32px;object-fit:contain;flex-shrink:0"> Klok<span>Ventures</span></a>
+  <div class="nav-clock" id="nav-clock">00:00:00</div>
+  <a class="nav-cta" href="mailto:cklok5174@gmail.com">Get in Touch</a>
+</nav>
+
+<div class="legal-hero">
+  <div class="hero-grid"></div>
+  <div class="legal-eyebrow">Klok Ventures · Legal</div>
+  <h1 class="legal-title">Client Services Agreement</h1>
+  <p class="legal-sub">A plain-English agreement between Klok Ventures and its clients. All projects are governed by this agreement plus an attached Project Scope.</p>
+  <div class="legal-meta">
+    <span>Template: June 25, 2026</span>
+    <span>Governing Law: State of Michigan</span>
+    <span>cklok5174@gmail.com</span>
+  </div>
+</div>
+
+<div class="legal-body">
+
+  <div class="legal-highlight" style="margin-bottom:32px">
+    <p>This agreement is entered into between <strong>Connor Klok, operating as Klok Ventures</strong> ("Contractor") and the client identified in the Project Scope attached to this Agreement ("Client"). Together referred to as the "Parties."</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">01</span> Services</div>
+    <p class="legal-p">Contractor agrees to provide digital product consulting and development services as described in the Project Scope document ("Scope") agreed to by both Parties prior to the commencement of work. The Scope defines the specific deliverables, features, and acceptance criteria for the project.</p>
+    <p class="legal-p">Any work not described in the agreed Scope is considered out of scope. Out-of-scope requests will be quoted separately and require written approval from both Parties before work begins.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">02</span> Payment</div>
+    <div class="legal-h2">2.1 Project Fee</div>
+    <p class="legal-p">The total project fee is set forth in the Project Scope. Payment is structured as follows:</p>
+    <ul class="legal-ul">
+      <li><strong>50% deposit</strong> is due before Contractor begins any work. Work will not commence until the deposit is received.</li>
+      <li><strong>50% balance</strong> is due upon delivery of the completed project, prior to transfer of files, credentials, or intellectual property to Client.</li>
+    </ul>
+    <div class="legal-h2">2.2 Retainer Fees</div>
+    <p class="legal-p">For ongoing retainer engagements, the monthly retainer fee is due on the first business day of each month. Contractor reserves the right to pause work if payment is more than seven (7) days past due.</p>
+    <div class="legal-h2">2.3 Payment Method & Late Fees</div>
+    <p class="legal-p">Payments are accepted via bank transfer, Stripe, or other methods agreed upon in writing. All fees are in US Dollars. Invoices unpaid after thirty (30) days from the due date may incur a late fee of 1.5% per month on the outstanding balance.</p>
+    <div class="legal-h2">2.4 Expenses</div>
+    <p class="legal-p">Any out-of-pocket expenses incurred on behalf of the Client (such as third-party software licenses, domain registration, or hosting setup fees) will be billed to Client at cost with prior written approval.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">03</span> Revisions</div>
+    <p class="legal-p">The project fee includes a reasonable number of revision rounds as specified in the Project Scope. A "revision" is a modification to existing agreed-upon features. New features or significant changes in direction that alter the Scope are not revisions and will be quoted separately.</p>
+    <p class="legal-p">Contractor will clearly communicate when a requested change falls outside the agreed revision scope before proceeding.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">04</span> Intellectual Property</div>
+    <div class="legal-h2">4.1 Transfer Upon Full Payment</div>
+    <p class="legal-p">Upon receipt of full payment, Contractor assigns to Client all rights, title, and interest in the custom deliverables created specifically for that project, including source code, design assets, and documentation unique to Client's project.</p>
+    <div class="legal-h2">4.2 Contractor's Retained Rights</div>
+    <p class="legal-p">Contractor retains ownership of any pre-existing tools, frameworks, templates, libraries, or methodologies used in the creation of the deliverables ("Background IP"). Client receives a non-exclusive, perpetual license to use Background IP solely as incorporated into the delivered project.</p>
+    <p class="legal-p">Contractor retains the right to use Client's project as a portfolio piece and case study, unless Client requests otherwise in writing. Any sensitive business information will be omitted from public case studies.</p>
+    <div class="legal-h2">4.3 Infrastructure</div>
+    <p class="legal-p">Third-party infrastructure used to host or operate Client's application (including Vercel, Supabase, or GitHub) is subject to those providers' terms of service. Contractor will transfer access credentials to Client upon full payment or at the end of the engagement, whichever is later.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">05</span> Confidentiality</div>
+    <p class="legal-p">Each Party agrees to keep confidential any non-public information received from the other Party in connection with this Agreement ("Confidential Information"). Confidential Information does not include information that: (a) is or becomes publicly known through no breach of this Agreement; (b) was already known to the receiving Party; or (c) is required to be disclosed by law.</p>
+    <p class="legal-p">This confidentiality obligation survives termination of this Agreement for a period of two (2) years.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">06</span> Timeline and Delays</div>
+    <p class="legal-p">Contractor will use reasonable efforts to deliver the project within the timeframe outlined in the Project Scope. Timelines are estimates and may be affected by the timely provision of materials, feedback, and approvals from Client.</p>
+    <p class="legal-p">If Client delays providing required content, feedback, or approvals by more than fourteen (14) days, Contractor reserves the right to reschedule the project and adjust the delivery timeline accordingly.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">07</span> Client Responsibilities</div>
+    <p class="legal-p">Client agrees to:</p>
+    <ul class="legal-ul">
+      <li>Provide all necessary content, assets, credentials, and information required for the project in a timely manner</li>
+      <li>Designate a single point of contact for project communications</li>
+      <li>Review and provide feedback on deliverables within the timeframe agreed in the Project Scope</li>
+      <li>Ensure any content provided does not infringe on third-party intellectual property rights</li>
+    </ul>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">08</span> Termination</div>
+    <div class="legal-h2">8.1 Termination by Client</div>
+    <p class="legal-p">Client may terminate this Agreement at any time with written notice. If Client terminates after work has commenced, the deposit is non-refundable. If work completed at the time of termination exceeds the deposit amount, Client agrees to pay for work completed at a pro-rated hourly rate of $150/hour.</p>
+    <div class="legal-h2">8.2 Termination by Contractor</div>
+    <p class="legal-p">Contractor may terminate this Agreement with fourteen (14) days written notice if Client: (a) fails to make a required payment; (b) fails to provide necessary materials or approvals after repeated requests; or (c) behaves in a manner that makes continued engagement unreasonable.</p>
+    <div class="legal-h2">8.3 Effect of Termination</div>
+    <p class="legal-p">Upon termination, each Party will return or destroy the other Party's Confidential Information upon request. Sections 4, 5, 9, and 10 of this Agreement survive termination.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">09</span> Limitation of Liability</div>
+    <p class="legal-p">Contractor's total liability to Client for any claims arising under this Agreement shall not exceed the total fees paid by Client to Contractor in the three (3) months preceding the claim.</p>
+    <p class="legal-p">In no event shall either Party be liable for indirect, incidental, consequential, or punitive damages, even if advised of the possibility of such damages. This limitation applies to all causes of action in the aggregate.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">10</span> Governing Law and Disputes</div>
+    <p class="legal-p">This Agreement shall be governed by the laws of the State of Michigan, United States. The Parties agree to attempt to resolve any dispute informally before initiating formal proceedings. If informal resolution fails, disputes shall be resolved by binding arbitration in Michigan under the rules of the American Arbitration Association.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">11</span> Entire Agreement</div>
+    <p class="legal-p">This Agreement, together with the Project Scope document, constitutes the entire agreement between the Parties and supersedes all prior discussions, representations, or agreements. Any modifications must be made in writing and signed by both Parties.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">12</span> Signatures</div>
+    <p class="legal-p" style="margin-bottom:20px">By signing below, both Parties agree to the terms of this Agreement and the attached Project Scope.</p>
+
+    <div class="sig-grid">
+      <div class="sig-block">
+        <div class="sig-party">Klok Ventures (Contractor)</div>
+        <div class="sig-field">
+          <div class="sig-line"></div>
+          <div class="sig-label">Signature</div>
+        </div>
+        <div class="sig-field">
+          <div class="sig-line"></div>
+          <div class="sig-label">Connor Klok · Date</div>
+        </div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-party">Client</div>
+        <div class="sig-field">
+          <div class="sig-line"></div>
+          <div class="sig-label">Signature</div>
+        </div>
+        <div class="sig-field">
+          <div class="sig-line"></div>
+          <div class="sig-label">Printed Name · Date</div>
+        </div>
+        <div class="sig-field">
+          <div class="sig-line"></div>
+          <div class="sig-label">Title · Company</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legal-disclaimer">
+    <p>This document is a template and does not constitute legal advice. Klok Ventures recommends having a licensed Michigan attorney review this agreement before use with clients. Template version: June 25, 2026.</p>
+  </div>
+
+</div>
+
+<footer>
+  <a class="footer-logo" href="index.html">Klok<span>Ventures</span></a>
+  <div class="footer-links">
+    <a href="klokventures-privacy-policy.html">Privacy Policy</a>
+    <a href="klokventures-terms-of-service.html">Terms of Service</a>
+    <a href="index.html">Back to Site</a>
+  </div>
+  <div class="footer-copy">© 2026 Connor Klok</div>
+</footer>
+
+<script>
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('nav-clock').textContent = h+':'+m+':'+s;
+}
+updateClock(); setInterval(updateClock, 1000);
+</script>
+</body>
+</html>

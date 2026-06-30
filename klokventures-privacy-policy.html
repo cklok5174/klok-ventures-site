@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="klokventures-favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Klok Ventures</title>
+<style>
+/* Shared styles matching klok-ventures.com */
+@import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@300;400;500;700&family=Sora:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0E0E10;
+  --dark: #16161A;
+  --panel: #1E1E24;
+  --blue: #2D6BE4;
+  --blue-dim: #1A4BA8;
+  --silver: #C8CAD0;
+  --white: #F2F0EC;
+  --muted: #6A6A76;
+  --divider: rgba(200,202,208,0.1);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Sora', sans-serif; background: var(--black); color: var(--white); line-height: 1.6; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; height: 56px;
+  background: rgba(14,14,16,0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--divider);
+}
+.nav-logo { font-family: 'Azeret Mono', monospace; font-size: 16px; font-weight: 700; color: var(--white); letter-spacing: 0.04em; text-decoration: none; }
+.nav-logo span { color: var(--blue); }
+.nav-clock { font-family: 'Azeret Mono', monospace; font-size: 13px; color: var(--muted); letter-spacing: 0.1em; }
+.nav-cta { font-family: 'Azeret Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); border: 1px solid var(--blue); padding: 7px 14px; text-decoration: none; transition: background 0.15s, color 0.15s; }
+.nav-cta:hover { background: var(--blue); color: white; }
+
+/* LEGAL PAGE LAYOUT */
+.legal-hero {
+  min-height: 40vh; display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 80px 24px 48px; position: relative; overflow: hidden; max-width: 100%;
+}
+.hero-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(var(--divider) 1px, transparent 1px), linear-gradient(90deg, var(--divider) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.3) 80%, transparent 100%);
+}
+.legal-eyebrow { font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; }
+.legal-title { font-size: clamp(28px, 6vw, 52px); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; color: var(--white); margin-bottom: 14px; }
+.legal-sub { font-size: 14px; font-weight: 300; color: var(--silver); max-width: 520px; line-height: 1.7; }
+.legal-meta { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.1em; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--divider); display: flex; gap: 24px; flex-wrap: wrap; }
+
+/* CONTENT */
+.legal-body { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+
+.legal-section { margin-bottom: 40px; }
+
+.legal-h1 { font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--divider); letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; }
+.legal-h1-num { font-family: 'Azeret Mono', monospace; font-size: 10px; font-weight: 500; color: var(--blue); letter-spacing: 0.14em; }
+
+.legal-h2 { font-size: 13px; font-weight: 700; color: var(--silver); margin: 20px 0 8px; letter-spacing: 0.04em; text-transform: uppercase; font-family: 'Azeret Mono', monospace; }
+
+.legal-p { font-size: 14px; font-weight: 300; color: var(--silver); line-height: 1.8; margin-bottom: 12px; }
+.legal-p a { color: var(--blue); text-decoration: none; }
+.legal-p a:hover { text-decoration: underline; }
+
+.legal-ul { list-style: none; margin: 0 0 14px 0; display: flex; flex-direction: column; gap: 6px; }
+.legal-ul li { font-size: 14px; font-weight: 300; color: var(--silver); line-height: 1.7; display: flex; gap: 12px; align-items: flex-start; }
+.legal-ul li::before { content: '→'; font-family: 'Azeret Mono', monospace; font-size: 11px; color: var(--blue); flex-shrink: 0; margin-top: 3px; }
+
+/* HIGHLIGHT BOX */
+.legal-highlight { background: var(--panel); border: 1px solid var(--divider); border-left: 3px solid var(--blue); padding: 18px 20px; margin-bottom: 16px; }
+.legal-highlight p { font-size: 13px; color: var(--silver); line-height: 1.75; margin: 0; }
+.legal-highlight strong { color: var(--white); font-weight: 600; }
+
+/* SIGNATURE BLOCK */
+.sig-block { background: var(--dark); border: 1px solid var(--divider); padding: 24px; margin-top: 8px; }
+.sig-label { font-family: 'Azeret Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--blue); margin-bottom: 16px; }
+.sig-line { border-bottom: 1px solid var(--silver); margin-bottom: 8px; height: 32px; }
+.sig-caption { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 20px; }
+
+/* DISCLAIMER */
+.legal-disclaimer { background: var(--panel); border: 1px solid var(--divider); padding: 16px 20px; margin-top: 40px; }
+.legal-disclaimer p { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.04em; line-height: 1.7; }
+
+/* FOOTER */
+footer { background: var(--dark); border-top: 1px solid var(--divider); padding: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.footer-logo { font-family: 'Azeret Mono', monospace; font-size: 14px; font-weight: 700; color: var(--muted); text-decoration: none; }
+.footer-logo span { color: var(--blue); }
+.footer-links { display: flex; gap: 20px; }
+.footer-links a { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); text-decoration: none; letter-spacing: 0.08em; transition: color 0.15s; }
+.footer-links a:hover { color: var(--white); }
+.footer-copy { font-family: 'Azeret Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; }
+
+@media (max-width: 640px) { .nav-clock { display: none; } .legal-meta { gap: 12px; } }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html"><img src="klokventures-logo.png" alt="Klok Ventures" style="height:32px;width:32px;object-fit:contain;flex-shrink:0"> Klok<span>Ventures</span></a>
+  <div class="nav-clock" id="nav-clock">00:00:00</div>
+  <a class="nav-cta" href="mailto:cklok5174@gmail.com">Get in Touch</a>
+</nav>
+
+<div class="legal-hero">
+  <div class="hero-grid"></div>
+  <div class="legal-eyebrow">Klok Ventures · Legal</div>
+  <h1 class="legal-title">Privacy Policy</h1>
+  <p class="legal-sub">How Klok Ventures collects, uses, and protects your information.</p>
+  <div class="legal-meta">
+    <span>Effective: June 25, 2026</span>
+    <span>Applies to: klok-ventures.com</span>
+    <span>Contact: cklok5174@gmail.com</span>
+  </div>
+</div>
+
+<div class="legal-body">
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">01</span> Overview</div>
+    <p class="legal-p">This Privacy Policy explains how Klok Ventures ("we," "us," or "our"), operated by Connor Klok, collects, uses, and safeguards information when you visit klok-ventures.com (the "Site") or contact us about our services. We are committed to protecting your privacy and being transparent about our data practices.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">02</span> Information We Collect</div>
+    <div class="legal-h2">2.1 Information You Provide Directly</div>
+    <p class="legal-p">We collect information you voluntarily provide when you:</p>
+    <ul class="legal-ul">
+      <li>Contact us via email or a contact form (name, email address, message content)</li>
+      <li>Request a project quote or demo (business name, industry, project description)</li>
+      <li>Schedule a call through a booking tool such as Calendly (name, email, meeting preferences)</li>
+    </ul>
+    <div class="legal-h2">2.2 Information Collected Automatically</div>
+    <p class="legal-p">When you visit our Site, basic technical information may be collected automatically by our hosting provider (Vercel), including IP address, browser type, pages visited, and time of visit. We do not currently use cookies, tracking pixels, or third-party analytics tools on this Site.</p>
+    <div class="legal-h2">2.3 Information We Do Not Collect</div>
+    <p class="legal-p">We do not collect payment information directly. We do not collect sensitive personal data such as government identification numbers, health information, or financial account details through this Site.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">03</span> How We Use Your Information</div>
+    <p class="legal-p">We use the information we collect solely to:</p>
+    <ul class="legal-ul">
+      <li>Respond to your inquiries and provide the services you request</li>
+      <li>Send you a project quote, working demo, or proposal</li>
+      <li>Schedule and conduct discovery or project calls</li>
+      <li>Communicate updates relevant to an active project</li>
+    </ul>
+    <p class="legal-p">We do not use your information for marketing purposes without your explicit consent, and we do not sell, rent, or share your personal information with third parties for their own commercial purposes.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">04</span> How We Store and Protect Your Information</div>
+    <p class="legal-p">Contact information you share with us is stored in our email system (Google Workspace) and, where applicable, in project management tools used solely for the purpose of delivering your project. We take reasonable measures to protect your information from unauthorized access, including using encrypted email and secure cloud storage.</p>
+    <p class="legal-p">We retain your contact information for as long as necessary to fulfill the purpose for which it was collected, or as required by applicable law. You may request deletion of your information at any time by contacting us at the email address below.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">05</span> Third-Party Services</div>
+    <p class="legal-p">In delivering our services, we may use the following third-party platforms, each governed by their own privacy policies:</p>
+    <ul class="legal-ul">
+      <li>Google Workspace (email and document storage) — <a href="https://policies.google.com/privacy" target="_blank">google.com/privacy</a></li>
+      <li>Vercel (website hosting) — <a href="https://vercel.com/legal/privacy-policy" target="_blank">vercel.com/legal/privacy-policy</a></li>
+      <li>Calendly (appointment scheduling) — <a href="https://calendly.com/privacy" target="_blank">calendly.com/privacy</a></li>
+      <li>GitHub (code storage) — <a href="https://docs.github.com/en/site-policy/privacy-policies" target="_blank">docs.github.com/privacy-policies</a></li>
+      <li>Supabase (database hosting for client projects) — <a href="https://supabase.com/privacy" target="_blank">supabase.com/privacy</a></li>
+    </ul>
+    <p class="legal-p">For client projects involving data storage, we will discuss applicable third-party data processors with you prior to deployment.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">06</span> Your Rights</div>
+    <p class="legal-p">Depending on your location, you may have the right to:</p>
+    <ul class="legal-ul">
+      <li>Request access to the personal information we hold about you</li>
+      <li>Request correction of inaccurate information</li>
+      <li>Request deletion of your personal information</li>
+      <li>Withdraw consent to further communications at any time</li>
+    </ul>
+    <p class="legal-p">To exercise any of these rights, please contact us at <a href="mailto:cklok5174@gmail.com">cklok5174@gmail.com</a>. We will respond within 30 days.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">07</span> Children's Privacy</div>
+    <p class="legal-p">Our Site and services are not directed at individuals under the age of 18. We do not knowingly collect personal information from minors. If you believe we have inadvertently collected information from a minor, please contact us immediately.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">08</span> Changes to This Policy</div>
+    <p class="legal-p">We may update this Privacy Policy from time to time. When we do, we will update the Effective Date at the top of this document. Your continued use of our Site following any changes constitutes acceptance of the updated policy. We encourage you to review this policy periodically.</p>
+  </div>
+
+  <div class="legal-section">
+    <div class="legal-h1"><span class="legal-h1-num">09</span> Contact</div>
+    <p class="legal-p">If you have questions or concerns about this Privacy Policy or our data practices, please contact:</p>
+    <div class="legal-highlight">
+      <p><strong>Connor Klok</strong> · Klok Ventures<br>
+      <a href="mailto:cklok5174@gmail.com">cklok5174@gmail.com</a> · <a href="https://klok-ventures.com">klok-ventures.com</a></p>
+    </div>
+  </div>
+
+  <div class="legal-disclaimer">
+    <p>Last updated: June 25, 2026 · © 2026 Connor Klok / Klok Ventures · All rights reserved</p>
+  </div>
+
+</div>
+
+<footer>
+  <a class="footer-logo" href="index.html">Klok<span>Ventures</span></a>
+  <div class="footer-links">
+    <a href="klokventures-privacy-policy.html">Privacy Policy</a>
+    <a href="klokventures-terms-of-service.html">Terms of Service</a>
+    <a href="index.html">Back to Site</a>
+  </div>
+  <div class="footer-copy">© 2026 Connor Klok</div>
+</footer>
+
+<script>
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('nav-clock').textContent = h+':'+m+':'+s;
+}
+updateClock(); setInterval(updateClock, 1000);
+</script>
+</body>
+</html>

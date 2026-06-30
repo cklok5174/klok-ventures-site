@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mezzanine — Table Experience</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --noir: #0E0E0E;
+    --charcoal: #1A1A1A;
+    --warm-dark: #221E18;
+    --ember: #C0602A;
+    --ember-light: #D9804A;
+    --cream: #F5F0E8;
+    --parchment: #EDE6D6;
+    --warm-gray: #8A8078;
+    --divider: rgba(255,255,255,0.08);
+    --white: #FFFFFF;
+  }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--noir);
+    color: var(--cream);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  .app-header {
+    background: var(--charcoal);
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--divider);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .restaurant-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: 0.04em;
+    color: var(--white);
+  }
+  .table-badge {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    background: rgba(255,255,255,0.05);
+    padding: 5px 10px;
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+  }
+  .table-badge span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ember-light);
+    letter-spacing: 0.01em;
+  }
+
+  /* TABS */
+  .main-tabs {
+    background: var(--charcoal);
+    display: flex;
+    border-bottom: 1px solid var(--divider);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mtab {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    padding: 13px 18px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    user-select: none;
+  }
+  .mtab.active {
+    color: var(--cream);
+    border-bottom-color: var(--ember);
+  }
+
+  /* CONTENT */
+  .content { flex: 1; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* MENU */
+  .menu-category {
+    padding: 24px 20px 6px;
+  }
+  .category-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ember);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .category-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--divider);
+  }
+
+  .menu-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--divider);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .menu-item:hover { background: rgba(255,255,255,0.03); }
+  .menu-item:active { background: rgba(255,255,255,0.06); }
+
+  .item-body { flex: 1; }
+  .item-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 5px;
+  }
+  .item-desc {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--warm-gray);
+    line-height: 1.55;
+    font-style: italic;
+  }
+  .item-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 7px;
+    flex-wrap: wrap;
+  }
+  .item-tag {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    background: rgba(255,255,255,0.05);
+    padding: 2px 7px;
+    border-radius: 2px;
+  }
+  .item-tag.chef { color: var(--ember-light); background: rgba(192,96,42,0.15); }
+
+  .item-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .item-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--cream);
+  }
+  .add-btn {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--ember);
+    background: transparent;
+    color: var(--ember);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    line-height: 1;
+  }
+  .add-btn:hover { background: var(--ember); color: white; }
+  .add-btn.added {
+    background: var(--ember);
+    color: white;
+    border-color: var(--ember);
+  }
+
+  /* ORDER PANEL */
+  .order-summary {
+    padding: 20px;
+  }
+  .order-empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--warm-gray);
+  }
+  .order-empty-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+  .order-empty-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 18px;
+  }
+
+  .order-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--divider);
+    gap: 12px;
+  }
+  .order-item-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    color: var(--white);
+    flex: 1;
+  }
+  .order-qty-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .qty-btn {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--divider);
+    background: transparent;
+    color: var(--cream);
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s;
+  }
+  .qty-btn:hover { border-color: var(--ember); color: var(--ember); }
+  .qty-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--white);
+    min-width: 20px;
+    text-align: center;
+  }
+  .order-item-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    color: var(--cream);
+    min-width: 52px;
+    text-align: right;
+  }
+
+  .order-totals {
+    padding: 16px 0;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    margin-top: 4px;
+  }
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-size: 13px;
+    color: var(--warm-gray);
+    font-weight: 300;
+  }
+  .total-row.grand {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--divider);
+    font-size: 17px;
+    color: var(--white);
+    font-weight: 500;
+  }
+  .total-row.grand .total-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .order-note-area {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--divider);
+    border-radius: 3px;
+    padding: 12px;
+    margin: 16px 0;
+  }
+  .order-note-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-bottom: 6px;
+  }
+  .order-note-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Jost', sans-serif;
+    font-size: 13px;
+    color: var(--cream);
+    resize: none;
+    min-height: 48px;
+    line-height: 1.5;
+  }
+  .order-note-input::placeholder { color: var(--warm-gray); }
+
+  .send-order-btn {
+    width: 100%;
+    background: var(--ember);
+    color: white;
+    border: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: 4px;
+  }
+  .send-order-btn:hover { background: var(--ember-light); }
+
+  /* LOYALTY PANEL */
+  .loyalty-card {
+    margin: 20px;
+    background: linear-gradient(135deg, #1A1208 0%, #2A1C0E 50%, #1A1208 100%);
+    border-radius: 10px;
+    padding: 24px;
+    border: 1px solid rgba(192,96,42,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .loyalty-card::before {
+    content: 'M';
+    position: absolute;
+    right: -10px;
+    top: -20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 140px;
+    font-weight: 600;
+    color: rgba(192,96,42,0.08);
+    line-height: 1;
+  }
+  .loyalty-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ember);
+    margin-bottom: 4px;
+  }
+  .loyalty-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 20px;
+  }
+  .loyalty-points {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 600;
+    color: var(--ember-light);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .loyalty-pts-label {
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--warm-gray);
+    letter-spacing: 0.08em;
+    margin-bottom: 20px;
+  }
+  .loyalty-bar-wrap {
+    background: rgba(255,255,255,0.07);
+    border-radius: 2px;
+    height: 4px;
+    margin-bottom: 8px;
+  }
+  .loyalty-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--ember), var(--ember-light));
+    border-radius: 2px;
+    width: 68%;
+  }
+  .loyalty-bar-label {
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--warm-gray);
+    font-style: italic;
+  }
+
+  .visit-history {
+    padding: 0 20px 20px;
+  }
+  .visit-heading {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    padding: 16px 0 12px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .visit-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--divider);
+  }
+  .visit-date {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--warm-gray);
+    font-style: italic;
+  }
+  .visit-items {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    color: var(--cream);
+    flex: 1;
+    padding: 0 16px;
+  }
+  .visit-pts {
+    font-size: 12px;
+    color: var(--ember-light);
+    font-weight: 500;
+  }
+
+  /* CART FLOAT */
+  .cart-float {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ember);
+    color: white;
+    border: none;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 13px 28px;
+    border-radius: 40px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(192,96,42,0.4);
+    transition: background 0.15s, transform 0.15s;
+    white-space: nowrap;
+    z-index: 50;
+  }
+  .cart-float:hover { background: var(--ember-light); transform: translateX(-50%) translateY(-2px); }
+  .cart-count {
+    background: white;
+    color: var(--ember);
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Jost', sans-serif;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(40px);
+    background: var(--charcoal);
+    color: var(--cream);
+    border: 1px solid var(--divider);
+    font-size: 13px;
+    font-weight: 400;
+    font-style: italic;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 4px;
+    z-index: 999;
+    transition: transform 0.25s ease, opacity 0.25s;
+    white-space: nowrap;
+    opacity: 0;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* VALUE TAB */
+  .rest-value { padding: 20px 16px 40px; }
+  .rest-value-hero {
+    background: var(--warm-dark);
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--ember);
+  }
+  .rest-value-eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ember);
+    margin-bottom: 8px;
+  }
+  .rest-value-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+  .rest-value-sub {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--warm-gray);
+    line-height: 1.65;
+  }
+  .rest-section-title {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .rest-pain-card {
+    background: var(--warm-dark);
+    border-radius: 4px;
+    padding: 14px;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .rest-pain-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .rest-pain-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 3px;
+  }
+  .rest-pain-desc { font-size: 12px; color: var(--warm-gray); line-height: 1.55; font-weight: 300; }
+  .rest-roi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .rest-roi-cell {
+    background: var(--warm-dark);
+    border-radius: 4px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .rest-roi-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--ember-light);
+    line-height: 1;
+  }
+  .rest-roi-label {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-top: 5px;
+    line-height: 1.4;
+  }
+  .rest-feature-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--divider);
+    font-size: 13px;
+    color: var(--cream);
+    font-weight: 300;
+  }
+  .rest-feature-row:last-child { border-bottom: none; }
+  .rest-check { color: var(--ember-light); flex-shrink: 0; margin-top: 1px; }
+  .rest-cta-card {
+    background: var(--ember);
+    border-radius: 6px;
+    padding: 22px 20px;
+    margin-top: 20px;
+    text-align: center;
+  }
+  .rest-cta-headline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .rest-cta-sub { font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 16px; line-height: 1.55; font-weight: 300; }
+  .rest-cta-btn {
+    display: inline-block;
+    background: var(--noir);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 12px 24px;
+    border-radius: 3px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="restaurant-name">Mezzanine</div>
+  <div class="table-badge">
+    Table
+    <span>14</span>
+  </div>
+</header>
+
+<nav class="main-tabs">
+  <div class="mtab active" data-tab="menu">Menu</div>
+  <div class="mtab" data-tab="order">Your Order</div>
+  <div class="mtab" data-tab="loyalty">Rewards</div>
+  <div class="mtab" data-tab="value" style="color:var(--ember-light)">★ Why This App</div>
+</nav>
+
+<div class="content">
+
+  <!-- MENU PANEL -->
+  <div class="panel active" id="panel-menu">
+
+    <div class="menu-category">
+      <div class="category-heading">To Begin</div>
+    </div>
+
+    <div class="menu-item" onclick="addToOrder('Yellowfin Crudo', 22)">
+      <div class="item-body">
+        <div class="item-name">Yellowfin Crudo</div>
+        <div class="item-desc">Meyer lemon oil, Calabrian chili, micro shiso, toasted sesame</div>
+        <div class="item-tags">
+          <span class="item-tag chef">Chef's Pick</span>
+          <span class="item-tag">GF</span>
+          <span class="item-tag">Contains: Fish, Sesame</span>
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-price">$22</div>
+        <button class="add-btn" id="btn-Yellowfin Crudo">+</button>
+      </div>
+    </div>
+
+    <div class="menu-item" onclick="addToOrder('Burrata', 18)">
+      <div class="item-body">
+        <div class="item-name">Burrata</div>
+        <div class="item-desc">Heirloom tomato, aged balsamic, torn basil, grilled sourdough</div>
+        <div class="item-tags">
+          <span class="item-tag">V</span>
+          <span class="item-tag">Contains: Dairy, Gluten</span>
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-price">$18</div>
+        <button class="add-btn" id="btn-Burrata">+</button>
+      </div>
+    </div>
+
+    <div class="menu-item" style="opacity:0.45;pointer-events:none">
+      <div class="item-body">
+        <div class="item-name" style="text-decoration:line-through">Roasted Bone Marrow</div>
+        <div class="item-desc">Chimichurri, capers, pickled shallot, grilled baguette</div>
+        <div class="item-tags">
+          <span class="item-tag" style="background:rgba(192,96,42,0.2);color:var(--ember-light)">86'd Tonight</span>
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-price" style="text-decoration:line-through">$19</div>
+        <button class="add-btn" style="opacity:0.3;cursor:not-allowed">−</button>
+      </div>
+    </div>
+
+    <div class="menu-category">
+      <div class="category-heading">Mains</div>
+    </div>
+
+    <div class="menu-item" onclick="addToOrder('Dry-Aged Duck Breast', 48)">
+      <div class="item-body">
+        <div class="item-name">Dry-Aged Duck Breast</div>
+        <div class="item-desc">Cherry gastrique, black lentils, sautéed watercress, smoked duck fat jus</div>
+        <div class="item-tags">
+          <span class="item-tag chef">Chef's Pick</span>
+          <span class="item-tag">GF</span>
+          <span class="item-tag">Contains: None declared</span>
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-price">$48</div>
+        <button class="add-btn" id="btn-Dry-Aged Duck Breast">+</button>
+      </div>
+    </div>
+
+    <div class="menu-item" onclick="addToOrder('Ricotta Gnocchi', 34)">
+      <div class="item-body">
+        <div class="item-name">Ricotta Gnocchi</div>
+        <div class="item-desc">Truffle brown butter, crispy sage, aged Parmigiano, pine nuts</div>
+        <div class="item-tags">
+          <span class="item-tag">V</span>
+          <span class="item-tag">Contains: Dairy, Gluten, Tree Nuts</span>
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-price">$34</div>
+        <button class="add-btn" id="btn-Ricotta Gnocchi">+</button>
+      </div>
+    </div>
+
+    <div class="menu-item" onclick="addToOrder('28-Day Dry-Aged Ribeye', 72)">
+      <div class="item-body">
+        <div class="item-name">28-Day Dry-Aged Ribeye</div>
+        <div class="item-desc">14oz prime, bone-in, bordelaise, roasted marrow butter, pommes Anna</div>
+        <div class="item-tags">
+          <span class="item-tag">GF</span>
+          <span class="item-tag">Contains: Dairy</span>
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-price">$72</div>
+        <button class="add-btn" id="btn-28-Day Dry-Aged Ribeye">+</button>
+      </div>
+    </div>
+
+    <div class="menu-category">
+      <div class="category-heading">Dessert</div>
+    </div>
+
+    <div class="menu-item" onclick="addToOrder('Valrhona Chocolate Soufflé', 16)">
+      <div class="item-body">
+        <div class="item-name">Valrhona Chocolate Soufflé</div>
+        <div class="item-desc">Please allow 20 minutes. Crème anglaise, fleur de sel</div>
+        <div class="item-tags">
+          <span class="item-tag">V</span>
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-price">$16</div>
+        <button class="add-btn" id="btn-Valrhona Chocolate Soufflé">+</button>
+      </div>
+    </div>
+
+    <div class="menu-item" onclick="addToOrder('Seasonal Tart', 14)">
+      <div class="item-body">
+        <div class="item-name">Seasonal Tart</div>
+        <div class="item-desc">Today: stone fruit frangipane, lavender crème fraîche, honeycomb</div>
+        <div class="item-tags">
+          <span class="item-tag">V</span>
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-price">$14</div>
+        <button class="add-btn" id="btn-Seasonal Tart">+</button>
+      </div>
+    </div>
+
+    <div style="height:80px"></div>
+  </div>
+
+  <!-- ORDER PANEL -->
+  <div class="panel" id="panel-order">
+    <div class="order-summary">
+      <div id="order-empty" class="order-empty">
+        <div class="order-empty-icon">🍽</div>
+        <div class="order-empty-text">Your order is empty</div>
+        <div style="font-size:12px;color:var(--warm-gray);margin-top:8px;">Add dishes from the menu</div>
+      </div>
+      <div id="order-items" style="display:none"></div>
+
+      <div id="order-footer" style="display:none">
+        <div class="order-totals">
+          <div class="total-row"><span>Subtotal</span><span class="total-val" id="total-sub">$0.00</span></div>
+          <div class="total-row"><span>Tax (8.25%)</span><span class="total-val" id="total-tax">$0.00</span></div>
+          <div class="total-row"><span>Suggested gratuity (20%)</span><span class="total-val" id="total-grat">$0.00</span></div>
+          <div class="total-row grand"><span>Estimated Total</span><span class="total-val" id="total-grand">$0.00</span></div>
+        </div>
+
+        <div class="order-note-area">
+          <div class="order-note-label">Special Instructions</div>
+          <textarea class="order-note-input" placeholder="Allergies, dietary needs, or preferences…"></textarea>
+        </div>
+
+        <button class="send-order-btn" onclick="sendOrder()">Send to Kitchen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOYALTY PANEL -->
+  <div class="panel" id="panel-loyalty">
+    <div class="loyalty-card">
+      <div class="loyalty-label">Mezzanine Membership</div>
+      <div class="loyalty-name">Alexandra Voss</div>
+      <div class="loyalty-points">1,840</div>
+      <div class="loyalty-pts-label">points · Copper tier</div>
+      <div class="loyalty-bar-wrap">
+        <div class="loyalty-bar-fill"></div>
+      </div>
+      <div class="loyalty-bar-label">660 points to Gold tier</div>
+    </div>
+
+    <div class="visit-history">
+      <div class="visit-heading">Recent Visits</div>
+      <div class="visit-row">
+        <div class="visit-date">Jun 8</div>
+        <div class="visit-items">Crudo, Duck Breast, Tart</div>
+        <div class="visit-pts">+220 pts</div>
+      </div>
+      <div class="visit-row">
+        <div class="visit-date">May 22</div>
+        <div class="visit-items">Bone Marrow, Ribeye, Soufflé</div>
+        <div class="visit-pts">+380 pts</div>
+      </div>
+      <div class="visit-row">
+        <div class="visit-date">Apr 30</div>
+        <div class="visit-items">Burrata, Gnocchi, Tart</div>
+        <div class="visit-pts">+160 pts</div>
+      </div>
+      <div class="visit-row">
+        <div class="visit-date">Apr 11</div>
+        <div class="visit-items">Chef's Tasting Menu ×2</div>
+        <div class="visit-pts">+480 pts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUE PANEL -->
+  <div class="panel" id="panel-value">
+    <div class="rest-value">
+
+      <div class="rest-value-hero">
+        <div class="rest-value-eyebrow">Built for Restaurants & Hospitality</div>
+        <div class="rest-value-headline">Own the guest relationship. Cut the middlemen. Never reprint another menu.</div>
+        <div class="rest-value-sub">Mezzanine puts your full menu, ordering, allergen info, and loyalty program directly in your guests' hands — no app store, no commission, no reprints. Your brand, your data, your revenue.</div>
+      </div>
+
+      <div class="rest-section-title">Pain Points This Eliminates</div>
+
+      <div class="rest-pain-card">
+        <div class="rest-pain-icon">💸</div>
+        <div>
+          <div class="rest-pain-title">Third-party platforms taking 15–30% per order</div>
+          <div class="rest-pain-desc">DoorDash, Grubhub, and UberEats extract a cut from every order placed through them, and they own the customer relationship — not you. This app routes orders directly from guest to kitchen with zero commission, and you retain the guest's data for repeat marketing.</div>
+        </div>
+      </div>
+      <div class="rest-pain-card">
+        <div class="rest-pain-icon">🚨</div>
+        <div>
+          <div class="rest-pain-title">Allergy incidents from unclear menu information</div>
+          <div class="rest-pain-desc">Paper menus and verbal descriptions create liability exposure when a guest misses an allergen. Every item in this app shows a clear "Contains:" tag for the top allergens — fish, dairy, gluten, tree nuts, sesame — so guests self-screen before they order, and you're protected.</div>
+        </div>
+      </div>
+      <div class="rest-pain-card">
+        <div class="rest-pain-icon">🙅</div>
+        <div>
+          <div class="rest-pain-title">Servers fielding "is that still available?" all night</div>
+          <div class="rest-pain-desc">When an item runs out, it takes one update to mark it 86'd in the app — instantly grayed out and unorderable for every guest at every table. No more awkward table returns, no comp requests because someone ordered something that was already gone.</div>
+        </div>
+      </div>
+      <div class="rest-pain-card">
+        <div class="rest-pain-icon">🖨️</div>
+        <div>
+          <div class="rest-pain-title">Seasonal menu reprints costing thousands per year</div>
+          <div class="rest-pain-desc">A typical restaurant spends $3,000–$8,000 annually on menu design and printing, plus the operational drag of sticker corrections and outdated QR codes. Update dishes, prices, and descriptions in seconds — no designer, no print shop, no delay.</div>
+        </div>
+      </div>
+      <div class="rest-pain-card">
+        <div class="rest-pain-icon">🃏</div>
+        <div>
+          <div class="rest-pain-title">Loyalty programs guests don't use because cards get lost</div>
+          <div class="rest-pain-desc">Punch cards in wallets get forgotten. This loyalty program lives on the guest's phone with their full visit history, point balance, and tier progress always visible. That visibility drives repeat visits — guests who can see their progress toward Gold are significantly more likely to come back.</div>
+        </div>
+      </div>
+      <div class="rest-pain-card" style="margin-bottom:20px">
+        <div class="rest-pain-icon">⏱️</div>
+        <div>
+          <div class="rest-pain-title">Slow service at peak hours losing you table turns</div>
+          <div class="rest-pain-desc">Guests ordering through the app send requests directly to the kitchen without waiting for a server pass. Special instructions and dietary notes arrive with the order — no transcription errors, faster firing, shorter ticket times. Two minutes per table turn adds up across a full service.</div>
+        </div>
+      </div>
+
+      <div class="rest-section-title">The Numbers</div>
+      <div class="rest-roi-grid">
+        <div class="rest-roi-cell">
+          <div class="rest-roi-num">0%</div>
+          <div class="rest-roi-label">Commission on orders placed through the app</div>
+        </div>
+        <div class="rest-roi-cell">
+          <div class="rest-roi-num">22%</div>
+          <div class="rest-roi-label">Average check lift with digital upsell prompts</div>
+        </div>
+        <div class="rest-roi-cell">
+          <div class="rest-roi-num">2 min</div>
+          <div class="rest-roi-label">Faster table turn with direct-to-kitchen ordering</div>
+        </div>
+        <div class="rest-roi-cell">
+          <div class="rest-roi-num">$0</div>
+          <div class="rest-roi-label">Per menu update — no designer, no printer</div>
+        </div>
+      </div>
+
+      <div class="rest-section-title">What's Included</div>
+      <div style="background:var(--warm-dark);border-radius:4px;padding:4px 14px;margin-bottom:20px">
+        <div class="rest-feature-row"><span class="rest-check">✓</span>Full digital menu with allergen tags, dietary flags, chef's picks</div>
+        <div class="rest-feature-row"><span class="rest-check">✓</span>Live 86'd item control — instantly removes unavailable dishes</div>
+        <div class="rest-feature-row"><span class="rest-check">✓</span>Table-side ordering with special instructions to kitchen</div>
+        <div class="rest-feature-row"><span class="rest-check">✓</span>Live order total with auto tax and gratuity calculation</div>
+        <div class="rest-feature-row"><span class="rest-check">✓</span>Loyalty program with tiers, points, and visit history</div>
+        <div class="rest-feature-row"><span class="rest-check">✓</span>Works offline — no WiFi dependency on the floor</div>
+        <div class="rest-feature-row"><span class="rest-check">✓</span>Fully branded — your name, palette, and voice</div>
+        <div class="rest-feature-row"><span class="rest-check">✓</span>You own your guest data — no platform middleman</div>
+      </div>
+
+      <div class="rest-cta-card">
+        <div class="rest-cta-headline">Ready to see it with your menu?</div>
+        <div class="rest-cta-sub">We'll build a live version with your actual dishes and branding in 24 hours. No commitment — just a demo worth showing your team.</div>
+        <a class="rest-cta-btn" href="mailto:you@youremail.com?subject=Restaurant App Demo Request">Let's Build Your Demo</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<button class="cart-float" id="cart-float" onclick="goToOrder()">
+  <span id="cart-label">View Order</span>
+  <span class="cart-count" id="cart-count">0</span>
+</button>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Tab nav
+  document.querySelectorAll('.mtab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.mtab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Order state
+  const orderItems = {};
+  const orderPrices = {};
+
+  function addToOrder(name, price) {
+    if (!orderItems[name]) {
+      orderItems[name] = 0;
+      orderPrices[name] = price;
+    }
+    orderItems[name]++;
+    const btn = document.getElementById('btn-' + name);
+    if (btn) { btn.textContent = '✓'; btn.classList.add('added'); }
+    updateCartFloat();
+    renderOrder();
+    showToast(name + ' added');
+  }
+
+  function updateCartFloat() {
+    const total = Object.values(orderItems).reduce((a, b) => a + b, 0);
+    const float = document.getElementById('cart-float');
+    const countEl = document.getElementById('cart-count');
+    countEl.textContent = total;
+    float.style.display = total > 0 ? 'flex' : 'none';
+  }
+
+  function renderOrder() {
+    const keys = Object.keys(orderItems).filter(k => orderItems[k] > 0);
+    const empty = document.getElementById('order-empty');
+    const itemsDiv = document.getElementById('order-items');
+    const footer = document.getElementById('order-footer');
+
+    if (keys.length === 0) {
+      empty.style.display = 'block';
+      itemsDiv.style.display = 'none';
+      footer.style.display = 'none';
+      return;
+    }
+
+    empty.style.display = 'none';
+    itemsDiv.style.display = 'block';
+    footer.style.display = 'block';
+
+    itemsDiv.innerHTML = keys.map(name => `
+      <div class="order-item">
+        <div class="order-item-name">${name}</div>
+        <div class="order-qty-ctrl">
+          <button class="qty-btn" onclick="changeQty('${name}', -1)">−</button>
+          <div class="qty-num">${orderItems[name]}</div>
+          <button class="qty-btn" onclick="changeQty('${name}', 1)">+</button>
+        </div>
+        <div class="order-item-price">$${(orderItems[name] * orderPrices[name]).toFixed(0)}</div>
+      </div>
+    `).join('');
+
+    const sub = keys.reduce((a, k) => a + orderItems[k] * orderPrices[k], 0);
+    const tax = sub * 0.0825;
+    const grat = sub * 0.20;
+    const grand = sub + tax + grat;
+
+    document.getElementById('total-sub').textContent = '$' + sub.toFixed(2);
+    document.getElementById('total-tax').textContent = '$' + tax.toFixed(2);
+    document.getElementById('total-grat').textContent = '$' + grat.toFixed(2);
+    document.getElementById('total-grand').textContent = '$' + grand.toFixed(2);
+  }
+
+  function changeQty(name, delta) {
+    orderItems[name] = Math.max(0, orderItems[name] + delta);
+    if (orderItems[name] === 0) {
+      const btn = document.getElementById('btn-' + name);
+      if (btn) { btn.textContent = '+'; btn.classList.remove('added'); }
+    }
+    updateCartFloat();
+    renderOrder();
+  }
+
+  function goToOrder() {
+    document.querySelectorAll('.mtab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelector('[data-tab="order"]').classList.add('active');
+    document.getElementById('panel-order').classList.add('active');
+  }
+
+  function sendOrder() {
+    const keys = Object.keys(orderItems).filter(k => orderItems[k] > 0);
+    if (keys.length === 0) return;
+    for (const k of keys) orderItems[k] = 0;
+    document.querySelectorAll('.add-btn').forEach(btn => {
+      btn.textContent = '+';
+      btn.classList.remove('added');
+    });
+    updateCartFloat();
+    renderOrder();
+    showToast('Order sent to kitchen — enjoy!');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+<style>.kw-watermark{position:fixed;bottom:12px;right:12px;z-index:99999;background:rgba(0,0,0,0.55);color:rgba(255,255,255,0.85);font-family:monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:5px 10px;border-radius:3px;pointer-events:none;backdrop-filter:blur(4px)}</style><div class="kw-watermark">Demo · klok-ventures.com</div></body>
+</html>

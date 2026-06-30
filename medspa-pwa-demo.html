@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumière — Client Portal</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito+Sans:wght@300;400;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --plum: #2D1F3D;
+  --plum-mid: #3D2A52;
+  --rose: #C4917A;
+  --rose-light: #D9AD9A;
+  --blush: #F2E8E8;
+  --sage: #E8EDE6;
+  --chalk: #FAFAF8;
+  --stone: #9A8FA0;
+  --ink: #1C1320;
+  --divider: rgba(45,31,61,0.1);
+  --green: #4A7A58;
+}
+
+body { font-family: 'Nunito Sans', sans-serif; background: var(--chalk); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* HEADER */
+.spa-header {
+  background: var(--plum);
+  padding: 20px 20px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.spa-name { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--chalk); letter-spacing: 0.02em; }
+.spa-tagline { font-size: 10px; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rose-light); margin-top: 2px; }
+.client-pill {
+  background: rgba(255,255,255,0.1); border-radius: 20px; padding: 6px 12px;
+  font-size: 11px; font-weight: 600; color: var(--rose-light); letter-spacing: 0.06em;
+}
+
+/* NEXT APPT BANNER */
+.next-appt {
+  background: linear-gradient(135deg, var(--plum-mid), var(--plum));
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.appt-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--rose); margin-bottom: 6px; }
+.appt-name { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--chalk); margin-bottom: 4px; }
+.appt-detail { font-size: 12px; font-weight: 300; color: var(--rose-light); letter-spacing: 0.04em; }
+.appt-countdown {
+  margin-top: 12px; background: rgba(255,255,255,0.07); border-radius: 6px;
+  padding: 10px 14px; display: flex; gap: 20px; align-items: center;
+}
+.countdown-val { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--rose-light); line-height: 1; }
+.countdown-label { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--stone); }
+
+/* TABS */
+.spa-tabs {
+  background: var(--plum); display: flex;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.spa-tab {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--stone); padding: 12px 18px; cursor: pointer;
+  border-bottom: 2px solid transparent; white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s; user-select: none;
+}
+.spa-tab.active { color: var(--rose-light); border-bottom-color: var(--rose); }
+
+/* PANELS */
+.spa-content { flex: 1; }
+.panel { display: none; padding: 20px 16px; }
+.panel.active { display: block; }
+.panel.no-pad { padding: 0; }
+
+/* SHARED LABELS */
+.sec-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--stone); margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--divider);
+}
+
+/* TREATMENT CARDS */
+.treatment-card {
+  background: var(--chalk); border: 1px solid var(--divider); border-radius: 8px;
+  padding: 16px; margin-bottom: 10px; cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.treatment-card:hover { box-shadow: 0 2px 12px rgba(45,31,61,0.1); border-color: var(--rose-light); }
+.tc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.tc-name { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--plum); }
+.tc-price { font-size: 15px; font-weight: 700; color: var(--rose); }
+.tc-desc { font-size: 12px; font-weight: 300; color: var(--stone); line-height: 1.6; margin-bottom: 10px; }
+.tc-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+.tc-tag {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 20px; background: var(--blush); color: var(--rose);
+}
+.tc-tag.sage { background: var(--sage); color: var(--green); }
+.tc-duration { font-size: 11px; font-weight: 600; color: var(--stone); display: flex; align-items: center; gap: 4px; }
+
+.book-btn {
+  width: 100%; margin-top: 12px; background: var(--plum); color: var(--chalk);
+  border: none; font-family: 'Nunito Sans', sans-serif; font-weight: 700;
+  font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 10px; border-radius: 6px; cursor: pointer; transition: background 0.15s;
+}
+.book-btn:hover { background: var(--plum-mid); }
+
+/* APPOINTMENTS */
+.appt-card {
+  background: var(--chalk); border: 1px solid var(--divider); border-radius: 8px;
+  padding: 14px 16px; margin-bottom: 10px; display: flex; gap: 14px;
+}
+.appt-date-block {
+  width: 44px; flex-shrink: 0; background: var(--plum); border-radius: 6px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 8px 4px;
+}
+.appt-month { font-size: 8px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--rose); }
+.appt-day { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--chalk); line-height: 1; }
+.appt-info { flex: 1; }
+.appt-treatment { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--plum); margin-bottom: 3px; }
+.appt-time { font-size: 11px; font-weight: 600; color: var(--stone); margin-bottom: 6px; }
+.appt-badge {
+  display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 2px 8px; border-radius: 20px;
+}
+.appt-badge.confirmed { background: rgba(74,122,88,0.12); color: var(--green); }
+.appt-badge.upcoming { background: var(--blush); color: var(--rose); }
+.appt-badge.past { background: rgba(154,143,160,0.12); color: var(--stone); }
+
+/* PROGRESS / JOURNEY */
+.journey-step {
+  display: flex; gap: 14px; margin-bottom: 4px; align-items: flex-start;
+}
+.step-line-wrap { display: flex; flex-direction: column; align-items: center; width: 28px; flex-shrink: 0; }
+.step-dot {
+  width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+.step-dot.done { background: var(--plum); color: var(--chalk); }
+.step-dot.active { background: var(--rose); color: white; }
+.step-dot.future { background: var(--blush); color: var(--stone); border: 1.5px solid var(--divider); }
+.step-connector { width: 2px; flex: 1; min-height: 24px; background: var(--divider); margin: 3px 0; }
+.step-body { flex: 1; padding-bottom: 20px; }
+.step-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--plum); margin-bottom: 3px; }
+.step-title.active { color: var(--rose); }
+.step-detail { font-size: 12px; font-weight: 300; color: var(--stone); line-height: 1.55; }
+
+/* VALUE PANEL */
+.spa-value { padding: 20px 16px 40px; background: var(--chalk); }
+.sv-hero { background: var(--plum); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+.sv-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--rose); margin-bottom: 8px; }
+.sv-headline { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--chalk); line-height: 1.25; margin-bottom: 10px; }
+.sv-sub { font-size: 13px; font-weight: 300; color: var(--rose-light); line-height: 1.65; }
+.sv-sec-title { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--divider); }
+.sv-pain { background: var(--chalk); border: 1px solid var(--divider); border-radius: 8px; padding: 14px; margin-bottom: 8px; display: flex; gap: 12px; }
+.sv-pain-icon { font-size: 20px; flex-shrink: 0; }
+.sv-pain-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--plum); margin-bottom: 3px; }
+.sv-pain-desc { font-size: 12px; font-weight: 300; color: var(--stone); line-height: 1.55; }
+.sv-roi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+.sv-roi-cell { background: var(--blush); border-radius: 8px; padding: 14px; text-align: center; }
+.sv-roi-num { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--plum); line-height: 1; }
+.sv-roi-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--stone); margin-top: 5px; line-height: 1.4; }
+.sv-feature-row { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--divider); font-size: 13px; color: var(--ink); font-weight: 400; align-items: flex-start; }
+.sv-feature-row:last-child { border-bottom: none; }
+.sv-check { color: var(--rose); font-weight: 700; flex-shrink: 0; }
+.sv-cta { background: var(--plum); border-radius: 8px; padding: 22px 20px; margin-top: 20px; text-align: center; }
+.sv-cta-headline { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--chalk); margin-bottom: 6px; }
+.sv-cta-sub { font-size: 12px; font-weight: 300; color: var(--rose-light); margin-bottom: 16px; line-height: 1.55; }
+.sv-cta-btn { display: inline-block; background: var(--rose); color: white; font-family: 'Nunito Sans', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; padding: 12px 24px; border-radius: 6px; text-decoration: none; border: none; cursor: pointer; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--plum); color: var(--rose-light); font-size: 13px; font-weight: 600;
+  letter-spacing: 0.04em; padding: 10px 20px; border-radius: 20px; z-index: 999;
+  transition: transform 0.25s ease; white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header class="spa-header">
+  <div>
+    <div class="spa-name">Lumière</div>
+    <div class="spa-tagline">Medical Aesthetics & Wellness</div>
+  </div>
+  <div class="client-pill">Hi, Priya ✦</div>
+</header>
+
+<div class="next-appt">
+  <div class="appt-eyebrow">Your Next Visit</div>
+  <div class="appt-name">HydraFacial MD + LED Therapy</div>
+  <div class="appt-detail">Tuesday, July 8 · 2:00 PM · with Erin Vale, NP</div>
+  <div class="appt-countdown">
+    <div>
+      <div class="countdown-val">14</div>
+      <div class="countdown-label">Days</div>
+    </div>
+    <div>
+      <div class="countdown-val">3</div>
+      <div class="countdown-label">Hours</div>
+    </div>
+    <div style="flex:1;text-align:right">
+      <button onclick="showToast('Reminder set ✓')" style="background:rgba(196,145,122,0.2);border:none;color:var(--rose-light);font-family:'Nunito Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:8px 14px;border-radius:20px;cursor:pointer">Set Reminder</button>
+    </div>
+  </div>
+</div>
+
+<nav class="spa-tabs">
+  <div class="spa-tab active" data-tab="treatments">Treatments</div>
+  <div class="spa-tab" data-tab="appointments">My Visits</div>
+  <div class="spa-tab" data-tab="loyalty">Rewards</div>
+  <div class="spa-tab" data-tab="journey">My Journey</div>
+  <div class="spa-tab" data-tab="value" style="color:var(--rose)">★ Why This App</div>
+</nav>
+
+<div class="spa-content">
+
+  <!-- TREATMENTS -->
+  <div class="panel active" id="panel-treatments">
+    <div class="sec-label">Featured Services</div>
+
+    <div class="treatment-card">
+      <div class="tc-header">
+        <div class="tc-name">HydraFacial MD</div>
+        <div class="tc-price">$189</div>
+      </div>
+      <div class="tc-desc">6-step medical-grade facial: cleanse, exfoliate, extract, hydrate, fuse peptides, and protect. Visible glow immediately after — no downtime.</div>
+      <div class="tc-meta">
+        <span class="tc-tag">Most Popular</span>
+        <span class="tc-tag sage">No Downtime</span>
+        <span class="tc-duration">⏱ 50 min</span>
+      </div>
+      <button class="book-btn" onclick="showToast('Booking flow opened')">Book This Treatment</button>
+    </div>
+
+    <div class="treatment-card">
+      <div class="tc-header">
+        <div class="tc-name">Neurotoxin (Botox / Dysport)</div>
+        <div class="tc-price">from $12/unit</div>
+      </div>
+      <div class="tc-desc">Precise placement for forehead lines, crow's feet, and brow lift. Performed by Erin Vale, NP. Results in 3–5 days, lasting 3–4 months.</div>
+      <div class="tc-meta">
+        <span class="tc-tag">Injectable</span>
+        <span class="tc-duration">⏱ 20 min</span>
+      </div>
+      <button class="book-btn" onclick="showToast('Consultation required — scheduling now')">Request Consultation</button>
+    </div>
+
+    <div class="treatment-card">
+      <div class="tc-header">
+        <div class="tc-name">VI Peel Precision Plus</div>
+        <div class="tc-price">$349</div>
+      </div>
+      <div class="tc-desc">Medical-grade peel targeting hyperpigmentation, melasma, and uneven texture. Includes post-peel kit. 5–7 days of peeling.</div>
+      <div class="tc-meta">
+        <span class="tc-tag">Medical Grade</span>
+        <span class="tc-tag" style="background:rgba(154,143,160,0.1);color:var(--stone)">5–7 day recovery</span>
+        <span class="tc-duration">⏱ 30 min</span>
+      </div>
+      <button class="book-btn" onclick="showToast('Booking flow opened')">Book This Treatment</button>
+    </div>
+
+    <div class="treatment-card">
+      <div class="tc-header">
+        <div class="tc-name">Sculptra Collagen Stimulator</div>
+        <div class="tc-price">$750 / vial</div>
+      </div>
+      <div class="tc-desc">Poly-L-lactic acid stimulates collagen over 3 months for natural volume restoration. Typically 2–3 sessions spaced 6 weeks apart.</div>
+      <div class="tc-meta">
+        <span class="tc-tag">Injectable</span>
+        <span class="tc-tag sage">Long-lasting</span>
+        <span class="tc-duration">⏱ 45 min</span>
+      </div>
+      <button class="book-btn" onclick="showToast('Consultation required — scheduling now')">Request Consultation</button>
+    </div>
+  </div>
+
+  <!-- APPOINTMENTS -->
+  <div class="panel" id="panel-appointments">
+    <div class="sec-label">Upcoming</div>
+
+    <div class="appt-card">
+      <div class="appt-date-block">
+        <div class="appt-month">Jul</div>
+        <div class="appt-day">8</div>
+      </div>
+      <div class="appt-info">
+        <div class="appt-treatment">HydraFacial MD + LED</div>
+        <div class="appt-time">2:00 PM · Erin Vale, NP · 80 min</div>
+        <span class="appt-badge confirmed">Confirmed</span>
+      </div>
+    </div>
+
+    <div class="appt-card">
+      <div class="appt-date-block">
+        <div class="appt-month">Aug</div>
+        <div class="appt-day">3</div>
+      </div>
+      <div class="appt-info">
+        <div class="appt-treatment">Neurotoxin Follow-up</div>
+        <div class="appt-time">11:30 AM · Erin Vale, NP · 20 min</div>
+        <span class="appt-badge upcoming">Scheduled</span>
+      </div>
+    </div>
+
+    <div class="sec-label" style="margin-top:20px">Past Visits</div>
+
+    <div class="appt-card">
+      <div class="appt-date-block" style="background:rgba(45,31,61,0.15)">
+        <div class="appt-month" style="color:var(--stone)">Jun</div>
+        <div class="appt-day" style="color:var(--plum)">10</div>
+      </div>
+      <div class="appt-info">
+        <div class="appt-treatment">HydraFacial MD</div>
+        <div class="appt-time">3:00 PM · Erin Vale, NP · 50 min</div>
+        <span class="appt-badge past">Completed</span>
+      </div>
+    </div>
+
+    <div class="appt-card">
+      <div class="appt-date-block" style="background:rgba(45,31,61,0.15)">
+        <div class="appt-month" style="color:var(--stone)">May</div>
+        <div class="appt-day" style="color:var(--plum)">2</div>
+      </div>
+      <div class="appt-info">
+        <div class="appt-treatment">Botox — Forehead & Crow's Feet</div>
+        <div class="appt-time">1:00 PM · Erin Vale, NP · 20 min</div>
+        <span class="appt-badge past">Completed · 42 units</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOYALTY -->
+  <div class="panel" id="panel-loyalty">
+
+    <div style="background:linear-gradient(135deg,var(--plum-mid),var(--plum));border-radius:10px;padding:22px;margin-bottom:16px;position:relative;overflow:hidden">
+      <div style="position:absolute;right:-12px;top:-16px;font-family:'DM Serif Display',serif;font-size:120px;color:rgba(196,145,122,0.08);line-height:1;pointer-events:none">L</div>
+      <div class="sec-label" style="color:var(--rose);border-color:rgba(196,145,122,0.2);margin-bottom:6px">Lumière Membership</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--chalk);margin-bottom:16px">Priya Sharma</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:48px;color:var(--rose-light);line-height:1;margin-bottom:4px">2,140</div>
+      <div style="font-size:11px;font-weight:300;color:var(--stone);letter-spacing:0.08em;margin-bottom:18px">points · Rose tier</div>
+      <div style="background:rgba(255,255,255,0.07);border-radius:3px;height:4px;margin-bottom:8px">
+        <div style="height:100%;background:linear-gradient(90deg,var(--rose),var(--rose-light));border-radius:3px;width:71%"></div>
+      </div>
+      <div style="font-size:11px;font-weight:300;color:var(--stone);font-style:italic">860 points to Lumière Gold</div>
+    </div>
+
+    <div class="sec-label">Rewards Available</div>
+
+    <div style="background:var(--chalk);border:1px solid var(--divider);border-radius:8px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px">
+      <div style="font-size:28px">✨</div>
+      <div style="flex:1">
+        <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--plum);margin-bottom:2px">LED Therapy Add-On — Free</div>
+        <div style="font-size:11px;font-weight:300;color:var(--stone)">500 points · Add to any facial booking</div>
+      </div>
+      <button onclick="showToast('LED add-on redeemed ✓')" style="background:var(--rose);color:white;border:none;font-family:'Nunito Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:7px 12px;border-radius:20px;cursor:pointer">Redeem</button>
+    </div>
+
+    <div style="background:var(--chalk);border:1px solid var(--divider);border-radius:8px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px">
+      <div style="font-size:28px">🎁</div>
+      <div style="flex:1">
+        <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--plum);margin-bottom:2px">$50 Toward Any Service</div>
+        <div style="font-size:11px;font-weight:300;color:var(--stone)">1,000 points · Apply at checkout</div>
+      </div>
+      <button onclick="showToast('$50 credit applied')" style="background:var(--rose);color:white;border:none;font-family:'Nunito Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:7px 12px;border-radius:20px;cursor:pointer">Redeem</button>
+    </div>
+
+    <div style="background:var(--chalk);border:1px solid var(--divider);border-radius:8px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:14px;opacity:0.5">
+      <div style="font-size:28px">👑</div>
+      <div style="flex:1">
+        <div style="font-family:'DM Serif Display',serif;font-size:16px;color:var(--plum);margin-bottom:2px">Complimentary HydraFacial</div>
+        <div style="font-size:11px;font-weight:300;color:var(--stone)">3,000 points · Gold tier members only</div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:var(--stone);text-align:right">860 pts<br>away</div>
+    </div>
+
+    <div class="sec-label">How You Earn</div>
+    <div style="background:var(--chalk);border:1px solid var(--divider);border-radius:8px;padding:4px 14px;margin-bottom:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--divider);font-size:13px">
+        <span style="color:var(--ink)">Every $1 spent</span>
+        <span style="font-weight:700;color:var(--rose)">10 pts</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--divider);font-size:13px">
+        <span style="color:var(--ink)">Refer a friend (who books)</span>
+        <span style="font-weight:700;color:var(--rose)">500 pts</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--divider);font-size:13px">
+        <span style="color:var(--ink)">Birthday month visit</span>
+        <span style="font-weight:700;color:var(--rose)">2× pts</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:13px">
+        <span style="color:var(--ink)">Pre-book next visit before leaving</span>
+        <span style="font-weight:700;color:var(--rose)">100 pts</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JOURNEY -->
+  <div class="panel" id="panel-journey">
+    <div class="sec-label">Your Treatment Journey</div>
+
+    <div class="journey-step">
+      <div class="step-line-wrap">
+        <div class="step-dot done">✓</div>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Initial Consultation</div>
+        <div class="step-detail">Apr 12 · Skin analysis and custom treatment plan with Erin Vale, NP. Goals: texture, glow, fine lines.</div>
+      </div>
+    </div>
+
+    <div class="journey-step">
+      <div class="step-line-wrap">
+        <div class="step-dot done">✓</div>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Neurotoxin Treatment</div>
+        <div class="step-detail">May 2 · Forehead and crow's feet. Results visible by May 6. Duration 3–4 months — follow-up scheduled Aug 3.</div>
+      </div>
+    </div>
+
+    <div class="journey-step">
+      <div class="step-line-wrap">
+        <div class="step-dot done">✓</div>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">HydraFacial MD</div>
+        <div class="step-detail">Jun 10 · Targeted congestion and texture. Immediate glow result. Erin recommends adding LED next session.</div>
+      </div>
+    </div>
+
+    <div class="journey-step">
+      <div class="step-line-wrap">
+        <div class="step-dot active">→</div>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title active">HydraFacial MD + LED Therapy</div>
+        <div class="step-detail">Jul 8 · Your next visit. LED add-on supports radiance and reduces redness. Tip: avoid retinol 3 days before.</div>
+      </div>
+    </div>
+
+    <div class="journey-step">
+      <div class="step-line-wrap">
+        <div class="step-dot future">4</div>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title" style="color:var(--stone)">Neurotoxin Follow-up</div>
+        <div class="step-detail">Aug 3 · 3-month touch-up review with Erin.</div>
+      </div>
+    </div>
+
+    <div class="journey-step">
+      <div class="step-line-wrap">
+        <div class="step-dot future">5</div>
+      </div>
+      <div class="step-body">
+        <div class="step-title" style="color:var(--stone)">VI Peel (Recommended for Fall)</div>
+        <div class="step-detail">Sep–Oct window · Best results with reduced sun exposure. Erin will discuss at your Aug visit.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALUE -->
+  <div class="panel no-pad" id="panel-value">
+    <div class="spa-value">
+      <div class="sv-hero">
+        <div class="sv-eyebrow">Built for Med Spas & Wellness Studios</div>
+        <div class="sv-headline">Turn one-time visitors into loyal clients who rebook before they leave — and refer before the month is out.</div>
+        <div class="sv-sub">Lumière gives every client a branded portal with their upcoming visits, full treatment history, loyalty rewards, and a personalized journey — all in one app they'll actually open between appointments.</div>
+      </div>
+
+      <div class="sv-sec-title">Pain Points This Eliminates</div>
+
+      <div class="sv-pain">
+        <div class="sv-pain-icon">📵</div>
+        <div>
+          <div class="sv-pain-title">Clients forget to rebook — and go somewhere else</div>
+          <div class="sv-pain-desc">Most spa clients intend to come back but simply forget. Without a touchpoint, they're one Instagram ad away from booking a competitor. This app stays on their phone between visits — they open it to check their appointment, browse treatments, or check their points balance. That passive presence is your most powerful retention tool.</div>
+        </div>
+      </div>
+      <div class="sv-pain">
+        <div class="sv-pain-icon">📅</div>
+        <div>
+          <div class="sv-pain-title">No-shows that cost $150–$400 per empty room hour</div>
+          <div class="sv-pain-desc">A forgotten appointment is pure lost revenue. The upcoming visit banner with live countdown and one-tap reminder keeps the appointment front of mind without staff having to call or text — and clients who set their own reminders almost never no-show.</div>
+        </div>
+      </div>
+      <div class="sv-pain">
+        <div class="sv-pain-icon">🃏</div>
+        <div>
+          <div class="sv-pain-title">Loyalty punch cards that end up in the trash</div>
+          <div class="sv-pain-desc">Paper loyalty cards get lost, forgotten, or left at home. A digital rewards program that lives on the client's phone — with a visible point balance, tier progress, and redeemable rewards — drives measurably more repeat visits. Clients who can see "860 points to Gold" come back to close the gap.</div>
+        </div>
+      </div>
+      <div class="sv-pain">
+        <div class="sv-pain-icon">🛒</div>
+        <div>
+          <div class="sv-pain-title">Treatment menus that live in a PDF nobody reads</div>
+          <div class="sv-pain-desc">A static PDF with no prices, no context, and no booking path converts nobody. Every treatment card here shows a clear description, duration, price, and a direct "Book This" button — so a client browsing at 10 PM on a Tuesday can schedule their next visit without a single phone call to your front desk.</div>
+        </div>
+      </div>
+      <div class="sv-pain">
+        <div class="sv-pain-icon">🧠</div>
+        <div>
+          <div class="sv-pain-title">Clients who don't know what they've had — or what to try next</div>
+          <div class="sv-pain-desc">When a client asks "what did I have last time?" and nobody can answer quickly, it feels disorganized. The Journey tab shows every past visit, the provider who performed it, and what's recommended next — so every appointment starts with context instead of confusion, and upsells feel like natural next steps.</div>
+        </div>
+      </div>
+      <div class="sv-pain" style="margin-bottom:20px">
+        <div class="sv-pain-icon">📣</div>
+        <div>
+          <div class="sv-pain-title">Referrals that happen by accident — or not at all</div>
+          <div class="sv-pain-desc">Word-of-mouth is your best acquisition channel, but most spas have no structured mechanism to encourage it. The loyalty program awards 500 points for every referred friend who books — creating a built-in incentive that turns happy clients into active advocates without any ad spend.</div>
+        </div>
+      </div>
+
+      <div class="sv-sec-title">The Numbers</div>
+      <div class="sv-roi-grid">
+        <div class="sv-roi-cell">
+          <div class="sv-roi-num">40%</div>
+          <div class="sv-roi-label">Fewer no-shows with in-app countdown reminder</div>
+        </div>
+        <div class="sv-roi-cell">
+          <div class="sv-roi-num">2.3×</div>
+          <div class="sv-roi-label">Higher rebooking rate vs. clients without a portal</div>
+        </div>
+        <div class="sv-roi-cell">
+          <div class="sv-roi-num">500 pts</div>
+          <div class="sv-roi-label">Referral reward drives structured word-of-mouth</div>
+        </div>
+        <div class="sv-roi-cell">
+          <div class="sv-roi-num">$0</div>
+          <div class="sv-roi-label">App store fees — client installs via link, any phone</div>
+        </div>
+      </div>
+
+      <div class="sv-sec-title">What's Included</div>
+      <div style="background:var(--chalk);border:1px solid var(--divider);border-radius:8px;padding:4px 14px;margin-bottom:20px">
+        <div class="sv-feature-row"><span class="sv-check">✓</span>Treatment menu with pricing, duration, and direct booking</div>
+        <div class="sv-feature-row"><span class="sv-check">✓</span>Upcoming appointment banner with countdown and reminder</div>
+        <div class="sv-feature-row"><span class="sv-check">✓</span>Full visit history — every treatment, every date</div>
+        <div class="sv-feature-row"><span class="sv-check">✓</span>Loyalty program with points, tiers, and redeemable rewards</div>
+        <div class="sv-feature-row"><span class="sv-check">✓</span>Referral incentive built into the rewards structure</div>
+        <div class="sv-feature-row"><span class="sv-check">✓</span>Personalized treatment journey and upcoming recommendations</div>
+        <div class="sv-feature-row"><span class="sv-check">✓</span>Fully branded with your spa's name, colors, and voice</div>
+        <div class="sv-feature-row"><span class="sv-check">✓</span>Works offline — no WiFi needed in-studio</div>
+      </div>
+
+      <div class="sv-cta">
+        <div class="sv-cta-headline">Ready for your client portal?</div>
+        <div class="sv-cta-sub">We'll build a live version branded to your spa with your real treatment menu in 24 hours.</div>
+        <a class="sv-cta-btn" href="mailto:you@youremail.com?subject=Med Spa Portal Demo">Get Your Demo</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  document.querySelectorAll('.spa-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.spa-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  function toggleChip(el) {
+    el.classList.toggle('selected');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+<style>.kw-watermark{position:fixed;bottom:12px;right:12px;z-index:99999;background:rgba(0,0,0,0.55);color:rgba(255,255,255,0.85);font-family:monospace;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:5px 10px;border-radius:3px;pointer-events:none;backdrop-filter:blur(4px)}</style><div class="kw-watermark">Demo · klok-ventures.com</div></body>
+</html>
