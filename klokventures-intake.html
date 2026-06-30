@@ -206,6 +206,12 @@ select.field-input { cursor: pointer; background-image: url("data:image/svg+xml,
 .copy-btn:hover { border-color: var(--blue); color: var(--blue); }
 .copy-btn.copied { border-color: var(--green); color: #4CAF70; }
 
+/* DETAILS / SUMMARY */
+details summary { list-style: none; }
+details summary::-webkit-details-marker { display: none; }
+details summary::before { content: '▶'; display: inline-block; font-size: 8px; margin-right: 8px; transition: transform 0.15s; }
+details[open] summary::before { transform: rotate(90deg); }
+
 /* HIGHLIGHT */
 .info-box { background: var(--panel); border: 1px solid var(--divider); border-left: 3px solid var(--blue); padding: 14px 16px; margin-bottom: 24px; }
 .info-box p { font-size: 12px; font-weight: 300; color: var(--silver); line-height: 1.7; }
@@ -364,7 +370,7 @@ footer { background: var(--dark); border-top: 1px solid var(--divider); padding:
     </div>
 
     <div class="info-box">
-      <p>The best demos solve a real pain point. The more specific you are here, the more accurate the demo will be to what your business actually needs.</p>
+      <p>The best fix starts with a real pain point. The more specific you are here, the more accurate my recommendation will be to what your business actually needs.</p>
     </div>
 
     <div class="field-group">
@@ -596,7 +602,7 @@ footer { background: var(--dark); border-top: 1px solid var(--divider); padding:
 
     <div class="btn-row">
       <button class="btn-ghost" onclick="prevStep(5)">← Edit</button>
-      <button class="btn-primary" onclick="submitForm()">Generate My Prompt →</button>
+      <button class="btn-primary" onclick="submitForm()">Prepare My Email →</button>
     </div>
   </div>
 
@@ -606,22 +612,27 @@ footer { background: var(--dark); border-top: 1px solid var(--divider); padding:
 <div class="form-wrap success-panel" id="success-panel">
   <div class="success-icon">⚡</div>
   <div class="success-title">Your intake is ready.</div>
-  <div class="success-sub">Copy the summary below and send it to Connor — he'll review it, figure out the right fix, and follow up with real next steps.</div>
+  <div class="success-sub">Click below to open your email with everything filled in — review it, then hit send.</div>
 
-  <div class="output-box">
-    <div class="output-box-label">Your Summary — Copy & Send to Connor</div>
-    <div class="output-text" id="output-text"></div>
-    <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copy</button>
-  </div>
+  <a id="send-email-btn" class="btn-primary" href="#" style="display:inline-block;font-size:14px;padding:16px 32px;margin-bottom:32px">Send to Connor →</a>
 
-  <div style="background:var(--panel);border:1px solid var(--divider);padding:16px 20px;text-align:left;margin-top:8px">
+  <div style="background:var(--panel);border:1px solid var(--divider);padding:16px 20px;text-align:left;margin-bottom:24px">
     <div style="font-family:'Azeret Mono',monospace;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">What happens next</div>
     <div style="font-size:13px;font-weight:300;color:var(--silver);line-height:1.7">
-      1. Copy the summary above and email it to <a href="mailto:cklok5174@gmail.com" style="color:var(--blue)">cklok5174@gmail.com</a> with subject line <strong style="color:var(--white)">"Project Inquiry"</strong><br>
+      1. Clicking the button above opens your email app with everything pre-filled — just hit send<br>
       2. Connor reviews it and comes back with real ideas — whether that's a working demo, a sample tool, or a clear plan<br>
       3. We talk through what fits best, then move forward together
     </div>
   </div>
+
+  <details style="text-align:left;margin-top:8px">
+    <summary style="font-family:'Azeret Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;padding:8px 0">Advanced: View full technical summary</summary>
+    <div class="output-box" style="margin-top:12px">
+      <div class="output-box-label">Full Summary — For Reference or Manual Copy</div>
+      <div class="output-text" id="output-text"></div>
+      <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">Copy</button>
+    </div>
+  </details>
 </div>
 
 <footer>
@@ -803,6 +814,7 @@ function submitForm() {
   const bizName = val('biz-name');
   const contactName = val('contact-name');
   const contactEmail = val('contact-email');
+  const contactPhone = val('contact-phone');
   const bizDesc = val('biz-description');
   const bizSize = val('biz-size');
   const bizAge = val('biz-age');
@@ -898,6 +910,46 @@ If a custom app or interactive tool is the right fit (or the client indicated in
 If a spreadsheet, automation, or process fix is the better answer, describe that solution clearly instead — what it would look like, how it would work, and what it would take to build or implement it. Don't force an app where one isn't the right tool.`;
 
   document.getElementById('output-text').textContent = prompt;
+
+  // Build a shorter, email-friendly summary for the mailto link
+  const emailSummary = `Hi Connor,
+
+I filled out the project intake form. Here's a summary:
+
+BUSINESS
+${bizName} — ${industry}
+Contact: ${contactName} (${contactEmail}${contactPhone !== '—' ? ', ' + contactPhone : ''})
+Size: ${bizSize} | Years in business: ${bizAge}
+
+About: ${bizDesc}
+
+THE PROBLEM
+${problem}
+
+Who's affected: ${whoAffected}
+Currently using: ${currentTools}
+Cost of the problem: ${costProblem}
+
+POSSIBLE TOOL DETAILS
+${appPurpose !== '—' ? 'What it might need to do: ' + appPurpose : 'No specific tool in mind yet — open to your recommendation.'}
+${features !== '—' ? 'Capabilities that might matter: ' + features : ''}
+${style !== '—' ? 'Style direction: ' + style : ''}
+${brandColor !== '—' ? 'Brand color: ' + brandColor : ''}
+
+LOGISTICS
+Urgency: ${urgency}
+Budget range: ${budget}
+Retainer interest: ${retainer}
+Integrations: ${integrations}
+${anythingElse !== '—' ? 'Other notes: ' + anythingElse : ''}
+
+Looking forward to hearing your thoughts.`;
+
+  // Build the mailto link
+  const subject = encodeURIComponent('Project Inquiry — ' + bizName);
+  const body = encodeURIComponent(emailSummary);
+  const mailtoLink = `mailto:cklok5174@gmail.com?subject=${subject}&body=${body}`;
+  document.getElementById('send-email-btn').href = mailtoLink;
 
   document.getElementById('panel-5').classList.remove('active');
   document.getElementById('success-panel').classList.add('active');
