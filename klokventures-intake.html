@@ -5,6 +5,14 @@
 <link rel="icon" type="image/png" href="klokventures-favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Start a Project — Klok Ventures</title>
+<meta name="description" content="Tell Klok Ventures what's slowing your business down — a clunky process, a spreadsheet mess, a manual workflow — and get real ideas for fixing it.">
+<link rel="canonical" href="https://klok-ventures.com/klokventures-intake.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://klok-ventures.com/klokventures-intake.html">
+<meta property="og:title" content="Start a Project — Klok Ventures">
+<meta property="og:description" content="Tell me what's slowing you down. I'll come back with real ideas — whether that's a custom app, a smarter spreadsheet, or a clearer process.">
+<meta property="og:image" content="https://klok-ventures.com/klokventures-logo.png">
+<meta property="og:site_name" content="Klok Ventures">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@300;400;500;700&family=Sora:wght@300;400;500;600;700&display=swap');
@@ -583,7 +591,7 @@ footer { background: var(--dark); border-top: 1px solid var(--divider); padding:
 
     <div class="btn-row">
       <button class="btn-ghost" onclick="prevStep(5)">← Edit</button>
-      <button class="btn-primary" onclick="submitForm()">Prepare My Email →</button>
+      <button class="btn-primary" onclick="submitForm()">Submit My Project Details →</button>
     </div>
   </div>
 
@@ -775,7 +783,7 @@ function buildReview() {
   document.getElementById('review-content').innerHTML = html;
 }
 
-// ── Submit → Generate Prompt ───────────────────────────────────
+// ── Submit → Supabase insert ───────────────────────────────────
 async function submitForm() {
   const industry = getChips('industry-chips');
   const bizName = val('biz-name');
@@ -802,6 +810,76 @@ async function submitForm() {
   const retainer = getChips('retainer-chips');
   const integrations = val('integrations');
   const anythingElse = val('anything-else');
+
+  // Build the prompt client-side — mirrors the DB trigger as a backup
+  const generatedPrompt = `NEW KLOK VENTURES CLIENT — BUILD THE RIGHT SOLUTION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BUSINESS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Business: ${bizName}
+Contact: ${contactName} (${contactEmail}${contactPhone !== '—' ? ', ' + contactPhone : ''})
+Industry: ${industry}
+Size: ${bizSize}
+Years in business: ${bizAge}
+
+About:
+${bizDesc}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+THE PROBLEM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Core problem:
+${problem}
+
+Who is affected: ${whoAffected}
+Currently using: ${currentTools}
+
+Cost of the problem:
+${costProblem}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+IF A CUSTOM TOOL MAKES SENSE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Who would use it: ${appUsers}
+Approx users: ${userCount}
+
+What it needs to do:
+${appPurpose}
+
+Capabilities: ${features}
+Integrations: ${integrations}
+Style direction: ${style}
+Brand color: ${brandColor}
+Demo name: ${demoName}
+Style notes: ${styleNotes}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROJECT CONTEXT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Urgency: ${urgency}
+Budget: ${budget}
+Retainer interest: ${retainer}
+Referral: ${val('referral')}
+Additional notes: ${anythingElse}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+INSTRUCTIONS FOR CLAUDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+You are helping Connor Klok (Klok Ventures) build the right solution for the client above.
+
+1. First recommend the right type of solution — custom app, spreadsheet/automation, process change, or combination. Briefly explain why based on the problem described.
+
+2. If a custom app is appropriate, build a single-file offline-capable HTML PWA demo that:
+   - Uses the style direction and brand color above
+   - Shows the demo name in the header
+   - Solves the specific problem described — tabs and features reflecting the actual workflow, not a generic template
+   - Includes realistic dummy data mirroring this client's industry
+   - Includes a "★ Why This Helps" tab addressing the pain points with a CTA to klok-ventures.com
+   - Adds a subtle "Demo · klok-ventures.com" watermark in the bottom-right corner
+   - Is fully functional, tappable, offline-capable, mobile-first
+   - Is delivered as a single self-contained HTML file
+
+3. If a spreadsheet or process fix is the better answer, describe that solution clearly instead.`;
 
   // Insert directly into Supabase — silent, no user-facing copy/paste/email step
   const { data, error } = await supabaseClient
@@ -832,7 +910,8 @@ async function submitForm() {
       retainer: retainer,
       integrations: integrations,
       referral: val('referral'),
-      anything_else: anythingElse
+      anything_else: anythingElse,
+      generated_prompt: generatedPrompt
     }]);
 
   document.getElementById('panel-5').classList.remove('active');
